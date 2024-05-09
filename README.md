@@ -13,6 +13,10 @@ a Go workspace to keep build-specific libraries like goyek out of your standard
 modules file, or remove the go.mod / go.sum files to include it as a normal
 package.
 
+Using the folder `build` is a goyek convention, but any folder name will work,
+i.e. if you already use `build` for transient artifacts. Note that these tasks
+use `out` for transient artifacts.
+
 A list of all tasks can be seen with `go run ./build -h`. The commonly used tasks
 will likely be:
 

@@ -11,6 +11,10 @@
   "settings": {
     "editor.tabSize": 2,
     "eslint.workingDirectories": [{ "mode": "auto" }],
+    "[github-actions-workflow]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     "gopls": {
       "formatting.gofumpt": true
     },
