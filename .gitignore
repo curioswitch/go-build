@@ -1,0 +1,5 @@
+.envrc
+.idea
+
+out
+go.work.sum

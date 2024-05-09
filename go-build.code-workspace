@@ -1,0 +1,32 @@
+{
+  "folders": [
+    {
+      "name": "/",
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+  },
+  "settings": {
+    "editor.tabSize": 2,
+    "eslint.workingDirectories": [{ "mode": "auto" }],
+    "gopls": {
+      "formatting.gofumpt": true
+    },
+    "jest.jestCommandLine": "yarn run test",
+    "jest.runMode": { "type": "on-demand", "deferred": true },
+    "[json]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[yaml]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+  }
+}
