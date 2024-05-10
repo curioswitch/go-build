@@ -5,4 +5,5 @@ const (
 	verGolangCILint = "v1.58.1"
 	verGosImports   = "v0.3.8"
 	verGoFumpt      = "v0.6.0"
+	verGoYamllint   = "v1.35.1"
 )
