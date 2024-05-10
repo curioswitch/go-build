@@ -30,12 +30,26 @@ func DefineTasks(opts ...Option) {
 		},
 	})
 
-	lint := goyek.Define(goyek.Task{
-		Name:  "lint",
-		Usage: "Lints the code.",
+	lintGo := goyek.Define(goyek.Task{
+		Name:  "lint-go",
+		Usage: "Lints Go code.",
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m", verGolangCILint))
 		},
+	})
+
+	lintYaml := goyek.Define(goyek.Task{
+		Name:  "lint-yaml",
+		Usage: "Lints Yaml code.",
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
+		},
+	})
+
+	lint := goyek.Define(goyek.Task{
+		Name:  "lint",
+		Usage: "Lints code in various languages.",
+		Deps:  goyek.Deps{lintGo, lintYaml},
 	})
 
 	test := goyek.Define(goyek.Task{

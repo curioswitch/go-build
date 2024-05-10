@@ -29,5 +29,9 @@ jobs:
             **/go.sum
             versions.go
 
-      - name: run checks
-        run: go run build check
+      - name: run lints
+        if: startsWith(matrix.os, 'ubuntu-')
+        run: go run build -v lint
+
+      - name: run tests
+        run: go run build -v test
