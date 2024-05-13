@@ -15,9 +15,9 @@ func DefineTasks(opts ...Option) {
 		o.apply(&conf)
 	}
 
-	goyek.Define(goyek.Task{
-		Name:  "format",
-		Usage: "Formats the code.",
+	formatGo := goyek.Define(goyek.Task{
+		Name:  "format-go",
+		Usage: "Formats Go code.",
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, fmt.Sprintf("go run mvdan.cc/gofumpt@%s -l -w .", verGoFumpt))
 
@@ -28,6 +28,18 @@ func DefineTasks(opts ...Option) {
 
 			cmd.Exec(a, fmt.Sprintf("go run github.com/daixiang0/gci@%s write %s .", verGci, importSecs))
 		},
+	})
+
+	goyek.Define(goyek.Task{
+		Name:  "format",
+		Usage: "Format code in various languages.",
+		Deps:  append(goyek.Deps{formatGo}, formatTasks...),
+	})
+
+	goyek.Define(goyek.Task{
+		Name:  "generate",
+		Usage: "Generates code.",
+		Deps:  generateTasks,
 	})
 
 	lintGo := goyek.Define(goyek.Task{
@@ -49,7 +61,7 @@ func DefineTasks(opts ...Option) {
 	lint := goyek.Define(goyek.Task{
 		Name:  "lint",
 		Usage: "Lints code in various languages.",
-		Deps:  goyek.Deps{lintGo, lintYaml},
+		Deps:  append(goyek.Deps{lintGo, lintYaml}, lintTasks...),
 	})
 
 	test := goyek.Define(goyek.Task{
