@@ -30,8 +30,15 @@ func DefineTasks(opts ...Option) {
 		}
 
 		if d.Name() == "go.mod" {
-			dir := "./" + filepath.Dir(path)
-			goModules = append(goModules, filepath.ToSlash(dir))
+			dir := filepath.Dir(path)
+
+			var mod string
+			if dir == "." {
+				mod = "./..."
+			} else {
+				mod = "./" + filepath.ToSlash(dir)
+			}
+			goModules = append(goModules, mod)
 		}
 
 		return nil
