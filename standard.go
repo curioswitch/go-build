@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/goyek/goyek/v2"
@@ -46,71 +47,83 @@ func DefineTasks(opts ...Option) {
 		goModules = []string{"."}
 	}
 
-	formatGo := goyek.Define(goyek.Task{
-		Name:     "format-go",
-		Usage:    "Formats Go code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
-		},
-	})
+	if !conf.excluded("format-go") {
+		RegisterFormatTask(goyek.Define(goyek.Task{
+			Name:     "format-go",
+			Usage:    "Formats Go code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
+			},
+		}))
+	}
 
-	lintGo := goyek.Define(goyek.Task{
-		Name:     "lint-go",
-		Usage:    "Lints Go code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
-		},
-	})
+	if !conf.excluded("lint-go") {
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-go",
+			Usage:    "Lints Go code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
+			},
+		}))
+	}
 
-	formatMarkdown := goyek.Define(goyek.Task{
-		Name:     "format-markdown",
-		Usage:    "Formats Markdown code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", verGoPrettier))
-		},
-	})
+	if !conf.excluded("format-markdown") {
+		RegisterFormatTask(goyek.Define(goyek.Task{
+			Name:     "format-markdown",
+			Usage:    "Formats Markdown code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", verGoPrettier))
+			},
+		}))
+	}
 
-	lintMarkdown := goyek.Define(goyek.Task{
-		Name:     "lint-markdown",
-		Usage:    "Lints Markdown code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", verGoPrettier))
-		},
-	})
+	if !conf.excluded("lint-markdown") {
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-markdown",
+			Usage:    "Lints Markdown code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", verGoPrettier))
+			},
+		}))
+	}
 
-	formatYaml := goyek.Define(goyek.Task{
-		Name:     "format-yaml",
-		Usage:    "Formats YAML code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", verGoPrettier))
-		},
-	})
+	if !conf.excluded("format-yaml") {
+		RegisterFormatTask(goyek.Define(goyek.Task{
+			Name:     "format-yaml",
+			Usage:    "Formats YAML code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", verGoPrettier))
+			},
+		}))
+	}
 
-	lintYaml := goyek.Define(goyek.Task{
-		Name:     "lint-yaml",
-		Usage:    "Lints YAML code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", verGoPrettier))
-			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
-		},
-	})
+	if !conf.excluded("lint-yaml") {
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-yaml",
+			Usage:    "Lints YAML code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
+			},
+		}))
+	}
 
 	goyek.Define(goyek.Task{
 		Name:  "format",
 		Usage: "Format code in various languages.",
-		Deps:  append(goyek.Deps{formatGo, formatMarkdown, formatYaml}, formatTasks...),
+		Deps:  formatTasks,
 	})
 
 	lint := goyek.Define(goyek.Task{
 		Name:  "lint",
 		Usage: "Lints code in various languages.",
-		Deps:  append(goyek.Deps{lintGo, lintMarkdown, lintYaml}, lintTasks...),
+		Deps:  lintTasks,
 	})
 
 	goyek.Define(goyek.Task{
@@ -140,6 +153,11 @@ func DefineTasks(opts ...Option) {
 
 type config struct {
 	artifactsPath string
+	excludeTasks  []string
+}
+
+func (c *config) excluded(task string) bool {
+	return slices.Contains(c.excludeTasks, task)
 }
 
 // Option is a configuration option for DefineTasks.
@@ -157,4 +175,19 @@ type artifactsPath string
 
 func (a artifactsPath) apply(c *config) {
 	c.artifactsPath = string(a)
+}
+
+// ExcludeTasks returns an Option to exclude tasks normally added by default. This can be used
+// to avoid unneeded tasks, for example to disable linting of Markdown while still keeping the
+// ability to manually autoformat it, or to redefine a task with a different implementation.
+func ExcludeTasks(task ...string) Option {
+	return excludeTasks{tasks: task}
+}
+
+type excludeTasks struct {
+	tasks []string
+}
+
+func (e excludeTasks) apply(c *config) {
+	c.excludeTasks = append(c.excludeTasks, e.tasks...)
 }
