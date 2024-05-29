@@ -3,6 +3,8 @@ package build
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/goyek/goyek/v2"
 	"github.com/goyek/x/cmd"
@@ -10,9 +12,31 @@ import (
 
 // DefineTasks defines common tasks for Go projects.
 func DefineTasks(opts ...Option) {
-	var conf config
+	conf := config{
+		artifactsPath: "out",
+	}
 	for _, o := range opts {
 		o.apply(&conf)
+	}
+
+	var goModules []string
+	if err := filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() {
+			return nil
+		}
+
+		if d.Name() == "go.mod" {
+			dir := "./" + filepath.Dir(path)
+			goModules = append(goModules, filepath.ToSlash(dir))
+		}
+
+		return nil
+	}); err != nil {
+		goModules = []string{"."}
 	}
 
 	formatGo := goyek.Define(goyek.Task{
@@ -20,14 +44,16 @@ func DefineTasks(opts ...Option) {
 		Usage:    "Formats Go code.",
 		Parallel: true,
 		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run mvdan.cc/gofumpt@%s -l -w .", verGoFumpt))
+			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
+		},
+	})
 
-			importSecs := "-s standard -s default"
-			for _, prefix := range conf.localPackagePrefixes {
-				importSecs += fmt.Sprintf(` -s "prefix(%s)"`, prefix)
-			}
-
-			cmd.Exec(a, fmt.Sprintf("go run github.com/daixiang0/gci@%s write %s .", verGci, importSecs))
+	lintGo := goyek.Define(goyek.Task{
+		Name:     "lint-go",
+		Usage:    "Lints Go code.",
+		Parallel: true,
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
 		},
 	})
 
@@ -40,42 +66,21 @@ func DefineTasks(opts ...Option) {
 		},
 	})
 
-	formatYaml := goyek.Define(goyek.Task{
-		Name:     "format-yaml",
-		Usage:    "Formats YAML code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", verGoPrettier))
-		},
-	})
-
-	goyek.Define(goyek.Task{
-		Name:  "format",
-		Usage: "Format code in various languages.",
-		Deps:  append(goyek.Deps{formatGo, formatMarkdown, formatYaml}, formatTasks...),
-	})
-
-	goyek.Define(goyek.Task{
-		Name:  "generate",
-		Usage: "Generates code.",
-		Deps:  generateTasks,
-	})
-
-	lintGo := goyek.Define(goyek.Task{
-		Name:     "lint-go",
-		Usage:    "Lints Go code.",
-		Parallel: true,
-		Action: func(a *goyek.A) {
-			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m", verGolangCILint))
-		},
-	})
-
 	lintMarkdown := goyek.Define(goyek.Task{
 		Name:     "lint-markdown",
 		Usage:    "Lints Markdown code.",
 		Parallel: true,
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", verGoPrettier))
+		},
+	})
+
+	formatYaml := goyek.Define(goyek.Task{
+		Name:     "format-yaml",
+		Usage:    "Formats YAML code.",
+		Parallel: true,
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", verGoPrettier))
 		},
 	})
 
@@ -89,21 +94,33 @@ func DefineTasks(opts ...Option) {
 		},
 	})
 
+	goyek.Define(goyek.Task{
+		Name:  "format",
+		Usage: "Format code in various languages.",
+		Deps:  append(goyek.Deps{formatGo, formatMarkdown, formatYaml}, formatTasks...),
+	})
+
 	lint := goyek.Define(goyek.Task{
 		Name:  "lint",
 		Usage: "Lints code in various languages.",
 		Deps:  append(goyek.Deps{lintGo, lintMarkdown, lintYaml}, lintTasks...),
 	})
 
+	goyek.Define(goyek.Task{
+		Name:  "generate",
+		Usage: "Generates code.",
+		Deps:  generateTasks,
+	})
+
 	test := goyek.Define(goyek.Task{
 		Name:  "test",
 		Usage: "Runs unit tests.",
 		Action: func(a *goyek.A) {
-			if err := os.MkdirAll("out", 0o755); err != nil {
+			if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil {
 				a.Errorf("failed to create out directory: %v", err)
 				return
 			}
-			cmd.Exec(a, "go test -coverprofile=out/coverage.txt -covermode=atomic -v -timeout=20m ./...")
+			cmd.Exec(a, fmt.Sprintf("go test -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", filepath.Join(conf.artifactsPath, "coverage.txt")))
 		},
 	})
 
@@ -115,7 +132,7 @@ func DefineTasks(opts ...Option) {
 }
 
 type config struct {
-	localPackagePrefixes []string
+	artifactsPath string
 }
 
 // Option is a configuration option for DefineTasks.
@@ -123,20 +140,14 @@ type Option interface {
 	apply(conf *config)
 }
 
-// LocalPackagePrefix returns an Option to indicate the local package prefix for the project.
-// Imports from this prefix will be ordered at the end of other import groups when formatting.
-// This option can be provided multiple times to separate multiple sections, in the order
-// provided.
-func LocalPackagePrefix(prefix string) Option {
-	return &localPackagePrefixOption{
-		localPackagePrefix: prefix,
-	}
+// ArtifactPath returns an Option to indicate the path to write temporary build artifacts to,
+// for example coverage reports. If not provided, the default is "out".
+func ArtifactsPath(path string) Option {
+	return artifactsPath(path)
 }
 
-type localPackagePrefixOption struct {
-	localPackagePrefix string
-}
+type artifactsPath string
 
-func (o *localPackagePrefixOption) apply(c *config) {
-	c.localPackagePrefixes = append(c.localPackagePrefixes, o.localPackagePrefix)
+func (a artifactsPath) apply(c *config) {
+	c.artifactsPath = string(a)
 }

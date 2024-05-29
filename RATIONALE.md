@@ -25,3 +25,15 @@ We believe there is significant stylistic benefit in having consistent import
 ordering and grouping, something the Go standard goimports [cannot do](https://github.com/golang/go/issues/20818).
 Both gci and gosimports are great tools for this, and we choose gci because it
 is also integrated with golangci-lint, making it simpler to verify in CI.
+
+## Use prettier (via wasilibs)
+
+There are tools in Go for formatting [markdown](https://github.com/shurcooL/markdownfmt) or
+[yaml](https://github.com/google/yamlfmt). While it would be convenient to `go run` them without
+worrying about Wasm, the experience isn't ideal because IDE integrations will generally require
+global tool installation, adding onboarding steps to developers.
+
+Prettier has extensive IDE integration, notably extensions such as VSCode bundle it and will
+run out-of-the-box without developer setup. We prioritize this ease-of-onboarding with the
+tradeoff that performance will be worse using the Wasm version with `go run`. Generally, there
+aren't enough YAML or Markdown files in a repo for it to be a huge issue.

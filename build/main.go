@@ -7,8 +7,6 @@ import (
 )
 
 func main() {
-	build.DefineTasks(
-		build.LocalPackagePrefix("github.com/curioswitch/go-build"),
-	)
+	build.DefineTasks()
 	boot.Main()
 }
