@@ -2,7 +2,7 @@
 
 `go-build` is a library containing common build commands for Go libraries,
 based on [goyek](https://github.com/goyek/goyek). While the tasks are
-primarily to satisfy build requirements for https://github.com/curioswitch,
+primarily to satisfy build requirements for [CurioSwitch](https://github.com/curioswitch),
 they are intended to be generally useful so if you'd like, give them a try.
 
 ## Features
