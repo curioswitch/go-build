@@ -16,8 +16,9 @@ func DefineTasks(opts ...Option) {
 	}
 
 	formatGo := goyek.Define(goyek.Task{
-		Name:  "format-go",
-		Usage: "Formats Go code.",
+		Name:     "format-go",
+		Usage:    "Formats Go code.",
+		Parallel: true,
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, fmt.Sprintf("go run mvdan.cc/gofumpt@%s -l -w .", verGoFumpt))
 
@@ -30,10 +31,28 @@ func DefineTasks(opts ...Option) {
 		},
 	})
 
+	formatMarkdown := goyek.Define(goyek.Task{
+		Name:     "format-markdown",
+		Usage:    "Formats Markdown code.",
+		Parallel: true,
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", verGoPrettier))
+		},
+	})
+
+	formatYaml := goyek.Define(goyek.Task{
+		Name:     "format-yaml",
+		Usage:    "Formats YAML code.",
+		Parallel: true,
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", verGoPrettier))
+		},
+	})
+
 	goyek.Define(goyek.Task{
 		Name:  "format",
 		Usage: "Format code in various languages.",
-		Deps:  append(goyek.Deps{formatGo}, formatTasks...),
+		Deps:  append(goyek.Deps{formatGo, formatMarkdown, formatYaml}, formatTasks...),
 	})
 
 	goyek.Define(goyek.Task{
@@ -43,17 +62,29 @@ func DefineTasks(opts ...Option) {
 	})
 
 	lintGo := goyek.Define(goyek.Task{
-		Name:  "lint-go",
-		Usage: "Lints Go code.",
+		Name:     "lint-go",
+		Usage:    "Lints Go code.",
+		Parallel: true,
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m", verGolangCILint))
 		},
 	})
 
-	lintYaml := goyek.Define(goyek.Task{
-		Name:  "lint-yaml",
-		Usage: "Lints Yaml code.",
+	lintMarkdown := goyek.Define(goyek.Task{
+		Name:     "lint-markdown",
+		Usage:    "Lints Markdown code.",
+		Parallel: true,
 		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", verGoPrettier))
+		},
+	})
+
+	lintYaml := goyek.Define(goyek.Task{
+		Name:     "lint-yaml",
+		Usage:    "Lints YAML code.",
+		Parallel: true,
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", verGoPrettier))
 			cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
 		},
 	})
@@ -61,7 +92,7 @@ func DefineTasks(opts ...Option) {
 	lint := goyek.Define(goyek.Task{
 		Name:  "lint",
 		Usage: "Lints code in various languages.",
-		Deps:  append(goyek.Deps{lintGo, lintYaml}, lintTasks...),
+		Deps:  append(goyek.Deps{lintGo, lintMarkdown, lintYaml}, lintTasks...),
 	})
 
 	test := goyek.Define(goyek.Task{
