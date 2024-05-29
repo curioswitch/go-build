@@ -18,13 +18,7 @@
     "gopls": {
       "formatting.gofumpt": true
     },
-    "jest.jestCommandLine": "yarn run test",
-    "jest.runMode": { "type": "on-demand", "deferred": true },
-    "[json]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[jsonc]": {
+    "[markdown]": {
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
