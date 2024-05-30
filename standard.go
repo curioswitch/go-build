@@ -20,31 +20,11 @@ func DefineTasks(opts ...Option) {
 		o.apply(&conf)
 	}
 
-	var goModules []string
-	if err := filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if d.IsDir() {
-			return nil
-		}
-
-		if d.Name() == "go.mod" {
-			dir := filepath.Dir(path)
-
-			var mod string
-			if dir == "." {
-				mod = "./..."
-			} else {
-				mod = "./" + filepath.ToSlash(dir)
-			}
-			goModules = append(goModules, mod)
-		}
-
-		return nil
-	}); err != nil {
-		goModules = []string{"."}
+	golangciTargets := []string{"./..."}
+	// Uses of go-build will very commonly have a build folder, if it is also a module,
+	// then let's automatically run checks on it.
+	if _, err := os.Stat(filepath.Join("build", "go.mod")); err == nil {
+		golangciTargets = append(golangciTargets, "./build")
 	}
 
 	if !conf.excluded("format-go") {
@@ -53,7 +33,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(golangciTargets, " ")))
 			},
 		}))
 	}
@@ -64,7 +44,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(goModules, " ")))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(golangciTargets, " ")))
 			},
 		}))
 	}
