@@ -188,7 +188,7 @@ func pathRelativeToRoot() (string, string) {
 	for {
 		if anyFileExists(base, ".git", "go.work") {
 			target, _ := filepath.Rel(base, dir)
-			return dir, target
+			return base, target
 		}
 
 		parent := filepath.Dir(base)
