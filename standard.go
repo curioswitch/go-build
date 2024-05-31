@@ -27,6 +27,8 @@ func DefineTasks(opts ...Option) {
 		golangciTargets = append(golangciTargets, "./build")
 	}
 
+	root, target := pathRelativeToRoot()
+
 	if !conf.excluded("format-go") {
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-go",
@@ -89,7 +91,12 @@ func DefineTasks(opts ...Option) {
 			Parallel: true,
 			Action: func(a *goyek.A) {
 				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", verGoPrettier))
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
+
+				if root == "" {
+					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
+				} else {
+					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s %s", verGoYamllint, target), cmd.Dir(root))
+				}
 			},
 		}))
 	}
@@ -170,4 +177,35 @@ type excludeTasks struct {
 
 func (e excludeTasks) apply(c *config) {
 	c.excludeTasks = append(c.excludeTasks, e.tasks...)
+}
+
+func pathRelativeToRoot() (string, string) {
+	dir, err := filepath.Abs(".")
+	if err != nil {
+		return "", ""
+	}
+	base := dir
+	for {
+		if anyFileExists(base, ".git", "go.work") {
+			target, _ := filepath.Rel(base, dir)
+			return dir, target
+		}
+
+		parent := filepath.Dir(base)
+		if parent == dir || parent == "" {
+			break
+		}
+
+		base = parent
+	}
+	return "", ""
+}
+
+func anyFileExists(dir string, files ...string) bool {
+	for _, f := range files {
+		if _, err := os.Stat(filepath.Join(dir, f)); err == nil {
+			return true
+		}
+	}
+	return false
 }
