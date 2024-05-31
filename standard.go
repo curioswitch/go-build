@@ -1,6 +1,7 @@
 package build
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,11 +9,16 @@ import (
 	"strings"
 
 	"github.com/goyek/goyek/v2"
+	_ "github.com/goyek/x/boot" // define flags to override
 	"github.com/goyek/x/cmd"
 )
 
 // DefineTasks defines common tasks for Go projects.
 func DefineTasks(opts ...Option) {
+	// Override the goyek verbosity default to true since it's generally better.
+	// -v=false can still be used to disable it.
+	_ = flag.Lookup("v").Value.Set("true")
+
 	conf := config{
 		artifactsPath: "out",
 	}

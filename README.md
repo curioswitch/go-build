@@ -19,6 +19,10 @@ format and lint tasks target the following languages:
 All supporting tasks are executed with `go run` - this means that all languages
 can be processed with only a single tool dependency, Go itself.
 
+Note that the goyek default of non-verbose output is overridden since it seems
+generally better to have verbose output. `-v=false` should be passed to a build
+command to disable verbose output.
+
 ## Usage
 
 The simplest way to use this library is to copy the contents of [build](./build)
