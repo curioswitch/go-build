@@ -6,15 +6,17 @@
     }
   ],
   "extensions": {
-    "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    "recommendations": ["esbenp.prettier-vscode"]
   },
   "settings": {
     "editor.tabSize": 2,
-    "eslint.workingDirectories": [{ "mode": "auto" }],
     "[github-actions-workflow]": {
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "go.lintFlags": ["--fix"],
+    "go.lintOnSave": "package",
+    "go.lintTool": "golangci-lint",
     "gopls": {
       "formatting.gofumpt": true
     },
