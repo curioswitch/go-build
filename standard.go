@@ -107,6 +107,20 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
+	if !conf.excluded("test-go") {
+		RegisterTestTask(goyek.Define(goyek.Task{
+			Name:  "test-go",
+			Usage: "Runs Go unit tests.",
+			Action: func(a *goyek.A) {
+				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil {
+					a.Errorf("failed to create out directory: %v", err)
+					return
+				}
+				cmd.Exec(a, fmt.Sprintf("go test -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", filepath.Join(conf.artifactsPath, "coverage.txt")))
+			},
+		}))
+	}
+
 	goyek.Define(goyek.Task{
 		Name:  "format",
 		Usage: "Format code in various languages.",
@@ -127,14 +141,8 @@ func DefineTasks(opts ...Option) {
 
 	test := goyek.Define(goyek.Task{
 		Name:  "test",
-		Usage: "Runs unit tests.",
-		Action: func(a *goyek.A) {
-			if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil {
-				a.Errorf("failed to create out directory: %v", err)
-				return
-			}
-			cmd.Exec(a, fmt.Sprintf("go test -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", filepath.Join(conf.artifactsPath, "coverage.txt")))
-		},
+		Usage: "Runs tests.",
+		Deps:  testTasks,
 	})
 
 	goyek.Define(goyek.Task{
