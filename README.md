@@ -14,10 +14,13 @@ format and lint tasks target the following languages:
 
 - Go
 - Markdown
+- Shell-like, including Dockerfile (files supported by [mvdan-sh](https://github.com/mvdan/sh))
 - YAML
 
 All supporting tasks are executed with `go run` - this means that all languages
-can be processed with only a single tool dependency, Go itself.
+can be processed with only a single tool dependency, Go itself. Programs like
+prettier are invoked using [wasilibs](https://github.com/wasilibs) to achieve
+this.
 
 Note that the goyek default of non-verbose output is overridden since it seems
 generally better to have verbose output. `-v=false` should be passed to a build

@@ -6,10 +6,22 @@
     }
   ],
   "extensions": {
-    "recommendations": ["esbenp.prettier-vscode"]
+    "recommendations": ["esbenp.prettier-vscode", "foxundermoon.shell-format"]
   },
   "settings": {
     "editor.tabSize": 2,
+    "[dockerfile]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[dotenv]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[ignore]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
     "[github-actions-workflow]": {
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -23,6 +35,10 @@
     "[markdown]": {
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[shellscript]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "foxundermoon.shell-format"
     },
     "[yaml]": {
       "editor.formatOnSave": true,
