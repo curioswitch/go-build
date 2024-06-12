@@ -79,6 +79,28 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
+	if !conf.excluded("format-shell") {
+		RegisterFormatTask(goyek.Define(goyek.Task{
+			Name:     "format-shell",
+			Usage:    "Formats shell-like code, including Dockerfile, ignore, dotenv.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", verGoPrettier))
+			},
+		}))
+	}
+
+	if !conf.excluded("lint-shell") {
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-shell",
+			Usage:    "Lints shell-like code, including Dockerfile, ignore, dotenv.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", verGoPrettier))
+			},
+		}))
+	}
+
 	if !conf.excluded("format-yaml") {
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-yaml",

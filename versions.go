@@ -2,6 +2,6 @@ package build
 
 const (
 	verGolangCILint = "v1.58.1"
-	verGoPrettier   = "79c5c1b6332968320c44f93a6a367c54b31796d3"
+	verGoPrettier   = "16a91d6604f1e9fa12ffd31e04e1eb6a28ad5afb"
 	verGoYamllint   = "v1.35.1"
 )
