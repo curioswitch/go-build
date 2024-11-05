@@ -29,7 +29,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: ${{ matrix.go && '' || 'go.work' }}
+          go-version-file: ${{ !matrix.go && 'go.work' || '' }}
           go-version: ${{ matrix.go }}
           cache-dependency-path: |
             **/go.sum
