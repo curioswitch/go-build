@@ -42,6 +42,7 @@ func DefineTasks(opts ...Option) {
 			Parallel: true,
 			Action: func(a *goyek.A) {
 				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, "go mod tidy")
 			},
 		}))
 	}
@@ -53,6 +54,7 @@ func DefineTasks(opts ...Option) {
 			Parallel: true,
 			Action: func(a *goyek.A) {
 				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(golangciTargets, " ")))
+				goModTidyDiff(a)
 			},
 		}))
 	}
