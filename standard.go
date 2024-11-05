@@ -11,6 +11,7 @@ import (
 	"github.com/goyek/goyek/v2"
 	_ "github.com/goyek/x/boot" // define flags to override
 	"github.com/goyek/x/cmd"
+	"golang.org/x/mod/modfile"
 )
 
 // DefineTasks defines common tasks for Go projects.
@@ -18,6 +19,8 @@ func DefineTasks(opts ...Option) {
 	// Override the goyek verbosity default to true since it's generally better.
 	// -v=false can still be used to disable it.
 	_ = flag.Lookup("v").Value.Set("true")
+
+	command := flag.String("cmd", "", "Command to execute with runall.")
 
 	conf := config{
 		artifactsPath: "out",
@@ -145,6 +148,32 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
+	if !conf.excluded(("runall")) && fileExists("go.work") {
+		RegisterGenerateTask(goyek.Define(goyek.Task{
+			Name:  "runall",
+			Usage: "Runs a command in each module in the workspace.",
+			Action: func(a *goyek.A) {
+				if *command == "" {
+					a.Error("missing -cmd flag required for runall")
+					return
+				}
+				content, err := os.ReadFile("go.work")
+				if err != nil {
+					a.Errorf("failed to read go.work: %v", err)
+					return
+				}
+				wf, err := modfile.ParseWork("go.work", content, nil)
+				if err != nil {
+					a.Errorf("failed to parse go.work: %v", err)
+					return
+				}
+				for _, u := range wf.Use {
+					cmd.Exec(a, *command, cmd.Dir(filepath.Join(".", u.Path)))
+				}
+			},
+		}))
+	}
+
 	goyek.Define(goyek.Task{
 		Name:  "format",
 		Usage: "Format code in various languages.",
@@ -241,9 +270,16 @@ func pathRelativeToRoot() (string, string) {
 
 func anyFileExists(dir string, files ...string) bool {
 	for _, f := range files {
-		if _, err := os.Stat(filepath.Join(dir, f)); err == nil {
+		if e := fileExists(filepath.Join(dir, f)); e {
 			return true
 		}
+	}
+	return false
+}
+
+func fileExists(p string) bool {
+	if _, err := os.Stat(p); err == nil {
+		return true
 	}
 	return false
 }

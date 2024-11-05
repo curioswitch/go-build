@@ -1,10 +1,11 @@
 module github.com/curioswitch/go-build
 
-go 1.20
+go 1.21
 
 require (
 	github.com/goyek/goyek/v2 v2.1.0
 	github.com/goyek/x v0.1.7
+	golang.org/x/mod v0.20.0
 )
 
 require (
