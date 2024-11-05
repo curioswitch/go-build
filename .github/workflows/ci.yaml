@@ -19,12 +19,18 @@ jobs:
           - macos-14
           - ubuntu-22.04
           - windows-2022
+        go:
+          - ""
+        include:
+          - os: ubuntu-22.04
+            go: stable
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: go.work
+          go-version-file: ${{ matrix.go && '' || 'go.work' }}
+          go-version: ${{ matrix.go }}
           cache-dependency-path: |
             **/go.sum
             versions.go
