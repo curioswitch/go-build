@@ -1,4 +1,4 @@
-# This workflow can be used as-is on a pull_request trigger to listen for dependabot PRs
+# This workflow can be used as-is on a pull_request_target trigger to listen for dependabot PRs
 # for Go. Because dependabot does not support Go workspaces, it syncs the workspace with
 # the PR by running `go work sync` and `go mod tidy` in each module.
 name: Go Dependabot PR Workspace Sync
@@ -29,6 +29,7 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
+          ref: ${{ github.head_ref }}
           token: ${{ steps.app-token.outputs.token }}
 
       - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
