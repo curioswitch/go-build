@@ -13,4 +13,4 @@ jobs:
     with:
       github_app_id: "1047503"
     secrets:
-      github_app_key: ${{ secrets.GITHUB_APP_KEY }}
+      github_app_key: ${{ secrets.CURIOSWITCH_APP_KEY }}
