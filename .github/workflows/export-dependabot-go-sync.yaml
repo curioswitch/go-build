@@ -35,12 +35,13 @@ jobs:
       - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
         with:
           go-version-file: go.work
+          cache: false
 
       - name: Sync Workspace
         run: go work sync
 
       - name: Tidy Modules
-        run: go run ./build -cmd 'go mod tidy' runall
+        run: go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'
 
       - run: git diff --exit-code
         id: check-diff
