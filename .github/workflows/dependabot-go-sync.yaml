@@ -8,7 +8,7 @@ on:
 
 jobs:
   sync:
-    uses: ./.github/workflows/export/dependabot-go-sync.yaml
+    uses: ./.github/workflows/export-dependabot-go-sync.yaml
     with:
       github_app_id: "1047503"
     secrets:
