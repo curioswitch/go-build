@@ -1,0 +1,34 @@
+# This workflow can be used as-is on a pull_request trigger to listen for dependabot PRs
+# for Go. Because dependabot does not support Go workspaces, it syncs the workspace with
+# the PR by running `go work sync` and `go mod tidy` in each module.
+name: Go Dependabot PR Workspace Sync
+
+on:
+  workflow_call:
+    inputs:
+      github_app_id:
+        type: string
+        description: ID of GitHub app with contents write permission
+        required: true
+    secrets:
+      github_app_key:
+        description: Private key of GitHub app with contents write permission
+        required: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    if: github.actor == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'go')
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
+        with:
+          go-version-file: go.work
+
+      - name: Sync Workspace
+        run: go work sync
+
+      - name: Tidy Modules
+        run: go run ./build -cmd 'go mod tidy' runall
