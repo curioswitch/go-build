@@ -21,7 +21,15 @@ jobs:
     if: github.actor == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'go')
 
     steps:
+      - uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1
+        id: app-token
+        with:
+          app-id: ${{ inputs.github_app_id }}
+          private-key: ${{ secrets.github_app_key }}
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
         with:
@@ -32,3 +40,14 @@ jobs:
 
       - name: Tidy Modules
         run: go run ./build -cmd 'go mod tidy' runall
+
+      - name: Commit Changes
+        run: |
+          BOT_USER_ID=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)
+          git config --global user.name '${{steps.app-token.outputs.app-slug}}[bot]'
+          git config --global user.email '${BOT_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com>'
+          git add .
+          git commit -m "Sync Workspace"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
