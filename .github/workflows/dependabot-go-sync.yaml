@@ -1,0 +1,15 @@
+name: Go Dependabot PR Workspace Sync
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  sync:
+    uses: ./.github/workflows/export/dependabot-go-sync.yaml
+    with:
+      github_app_id: "1047503"
+    secrets:
+      github_app_key: ${{ secrets.GITHUB_APP_KEY }}
