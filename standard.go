@@ -29,6 +29,18 @@ func DefineTasks(opts ...Option) {
 		o.apply(&conf)
 	}
 
+	if conf.verGolangCILint == "" {
+		conf.verGolangCILint = verGolangCILint
+	}
+
+	if conf.verGoPrettier == "" {
+		conf.verGoPrettier = verGoPrettier
+	}
+
+	if conf.verGoYamllint == "" {
+		conf.verGoYamllint = verGoYamllint
+	}
+
 	golangciTargets := []string{"./..."}
 	// Uses of go-build will very commonly have a build folder, if it is also a module,
 	// then let's automatically run checks on it.
@@ -44,7 +56,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --fix --timeout=20m %s", verGolangCILint, strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --build-tags "%s" --fix --timeout=20m %s`, conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
 				cmd.Exec(a, "go mod tidy")
 			},
 		}))
@@ -56,7 +68,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --timeout=20m %s", verGolangCILint, strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --build-tags "%s" --timeout=20m %s`, conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
 				goModTidyDiff(a)
 			},
 		}))
@@ -68,7 +80,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -79,7 +91,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -90,7 +102,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -101,7 +113,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -112,7 +124,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -123,12 +135,12 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", verGoPrettier))
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", conf.verGoPrettier))
 
 				if root == "" {
-					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", verGoYamllint))
+					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", conf.verGoYamllint))
 				} else {
-					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s %s", verGoYamllint, target), cmd.Dir(root))
+					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s %s", conf.verGoYamllint, target), cmd.Dir(root))
 				}
 			},
 		}))
@@ -208,6 +220,11 @@ func DefineTasks(opts ...Option) {
 type config struct {
 	artifactsPath string
 	excludeTasks  []string
+	buildTags     []string
+
+	verGolangCILint string
+	verGoPrettier   string
+	verGoYamllint   string
 }
 
 func (c *config) excluded(task string) bool {
@@ -282,4 +299,54 @@ func fileExists(p string) bool {
 		return true
 	}
 	return false
+}
+
+// Tags returns an Option to add build tags to Go lint tasks. If any code is guarded by a build tag
+// from default compilation, it should be added here to ensure it is linted.
+func Tags(tags ...string) Option {
+	return buildTags{tags: tags}
+}
+
+type buildTags struct {
+	tags []string
+}
+
+func (b buildTags) apply(c *config) {
+	c.buildTags = append(c.buildTags, b.tags...)
+}
+
+// VersionGolangCILint returns an Option to set the version of golangci-lint to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGolangCILint(version string) Option {
+	return versionGolangCILint(version)
+}
+
+type versionGolangCILint string
+
+func (v versionGolangCILint) apply(c *config) {
+	c.verGolangCILint = string(v)
+}
+
+// VersionGoPrettier returns an Option to set the version of go-prettier to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoPrettier(version string) Option {
+	return versionGoPrettier(version)
+}
+
+type versionGoPrettier string
+
+func (v versionGoPrettier) apply(c *config) {
+	c.verGoPrettier = string(v)
+}
+
+// VersionGoYamllint returns an Option to set the version of go-yamllint to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoYamllint(version string) Option {
+	return versionGoYamllint(version)
+}
+
+type versionGoYamllint string
+
+func (v versionGoYamllint) apply(c *config) {
+	c.verGoYamllint = string(v)
 }

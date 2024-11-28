@@ -1,7 +1,7 @@
 package build
 
 const (
-	verGolangCILint = "v1.61.0"
-	verGoPrettier   = "v1.33.3"
+	verGolangCILint = "v1.62.2"
+	verGoPrettier   = "v3.4.1"
 	verGoYamllint   = "v1.35.1"
 )
