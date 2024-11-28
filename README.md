@@ -16,6 +16,7 @@ format and lint tasks target the following languages:
 - Markdown
 - Shell-like, including Dockerfile (files supported by [mvdan-sh](https://github.com/mvdan/sh))
 - YAML
+- GitHub Actions
 
 All supporting tasks are executed with `go run` - this means that all languages
 can be processed with only a single tool dependency, Go itself. Programs like
