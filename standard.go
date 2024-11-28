@@ -29,12 +29,20 @@ func DefineTasks(opts ...Option) {
 		o.apply(&conf)
 	}
 
+	if conf.verActionlint == "" {
+		conf.verActionlint = verActionlint
+	}
+
 	if conf.verGolangCILint == "" {
 		conf.verGolangCILint = verGolangCILint
 	}
 
 	if conf.verGoPrettier == "" {
 		conf.verGoPrettier = verGoPrettier
+	}
+
+	if conf.verGoShellcheck == "" {
+		conf.verGoShellcheck = verGoShellcheck
 	}
 
 	if conf.verGoYamllint == "" {
@@ -44,7 +52,7 @@ func DefineTasks(opts ...Option) {
 	golangciTargets := []string{"./..."}
 	// Uses of go-build will very commonly have a build folder, if it is also a module,
 	// then let's automatically run checks on it.
-	if _, err := os.Stat(filepath.Join("build", "go.mod")); err == nil {
+	if fileExists(filepath.Join("build", "go.mod")) {
 		golangciTargets = append(golangciTargets, "./build")
 	}
 
@@ -160,7 +168,7 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
-	if !conf.excluded(("runall")) && fileExists("go.work") {
+	if !conf.excluded("runall") && fileExists("go.work") {
 		RegisterGenerateTask(goyek.Define(goyek.Task{
 			Name:  "runall",
 			Usage: "Runs a command in each module in the workspace.",
@@ -182,6 +190,17 @@ func DefineTasks(opts ...Option) {
 				for _, u := range wf.Use {
 					cmd.Exec(a, *command, cmd.Dir(filepath.Join(".", u.Path)))
 				}
+			},
+		}))
+	}
+
+	if !conf.excluded("lint-github") && fileExists(".github") {
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-github",
+			Usage:    "Lints GitHub Actions workflows.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/rhysd/actionlint/cmd/actionlint@%s -shellcheck="go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@%s"`, conf.verActionlint, conf.verGoShellcheck))
 			},
 		}))
 	}
@@ -222,9 +241,11 @@ type config struct {
 	excludeTasks  []string
 	buildTags     []string
 
+	verActionlint   string
 	verGolangCILint string
 	verGoPrettier   string
 	verGoYamllint   string
+	verGoShellcheck string
 }
 
 func (c *config) excluded(task string) bool {
@@ -315,6 +336,18 @@ func (b buildTags) apply(c *config) {
 	c.buildTags = append(c.buildTags, b.tags...)
 }
 
+// VersionActionlint returns an Option to set the version of actionlint to use. If unset,
+// a default version is used which may not be the latest.
+func VersionActionlint(version string) Option {
+	return versionActionlint(version)
+}
+
+type versionActionlint string
+
+func (v versionActionlint) apply(c *config) {
+	c.verActionlint = string(v)
+}
+
 // VersionGolangCILint returns an Option to set the version of golangci-lint to use. If unset,
 // a default version is used which may not be the latest.
 func VersionGolangCILint(version string) Option {
@@ -337,6 +370,18 @@ type versionGoPrettier string
 
 func (v versionGoPrettier) apply(c *config) {
 	c.verGoPrettier = string(v)
+}
+
+// VersionGoShellcheck returns an Option to set the version of go-shellcheck to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoShellcheck(version string) Option {
+	return versionGoShellcheck(version)
+}
+
+type versionGoShellcheck string
+
+func (v versionGoShellcheck) apply(c *config) {
+	c.verGoShellcheck = string(v)
 }
 
 // VersionGoYamllint returns an Option to set the version of go-yamllint to use. If unset,
