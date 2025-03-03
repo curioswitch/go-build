@@ -9,7 +9,7 @@ require (
 
 require (
 	github.com/fatih/color v1.17.0 // indirect
-	github.com/goyek/goyek/v2 v2.2.0 // indirect
+	github.com/goyek/goyek/v2 v2.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-shellwords v1.0.12 // indirect
