@@ -1,6 +1,7 @@
 module github.com/curioswitch/go-build
 
-go 1.21
+go 1.22.5
+
 toolchain go1.24.1
 
 require (
