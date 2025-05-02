@@ -64,7 +64,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --build-tags "%s" --fix --timeout=20m %s`, conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s fmt %s`, conf.verGolangCILint, strings.Join(golangciTargets, " ")))
 				cmd.Exec(a, "go mod tidy")
 			},
 		}))
@@ -76,7 +76,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/cmd/golangci-lint@%s run --build-tags "%s" --timeout=20m %s`, conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s run --build-tags "%s" --timeout=20m %s`, conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
 				goModTidyDiff(a)
 			},
 		}))
@@ -159,7 +159,7 @@ func DefineTasks(opts ...Option) {
 			Name:  "test-go",
 			Usage: "Runs Go unit tests.",
 			Action: func(a *goyek.A) {
-				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil {
+				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil { //nolint:gosec // common for build artifacts
 					a.Errorf("failed to create out directory: %v", err)
 					return
 				}

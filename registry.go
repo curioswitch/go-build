@@ -1,6 +1,8 @@
 package build
 
-import "github.com/goyek/goyek/v2"
+import (
+	"github.com/goyek/goyek/v2"
+)
 
 var (
 	formatTasks   goyek.Deps
