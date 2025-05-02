@@ -1,37 +1,64 @@
+version: "2"
 linters:
   enable:
-    # We opt-in to style linters without the preset since many
-    # are too strict (e.g., no init functions allowed).
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
     - decorder
     - dupword
-    - gci
+    - durationcheck
+    - errchkjson
+    - errorlint
+    - exhaustive
+    - fatcontext
+    - gocheckcompilerdirectives
+    - gochecksumtype
     - gocritic
-    - gofumpt
     - goprintffuncname
+    - gosec
+    - gosmopolitan
     - inamedparam
+    - loggercheck
+    - makezero
     - mirror
+    - musttag
+    - nilerr
+    - nilnesserr
+    - noctx
+    - perfsprint
+    - prealloc
+    - protogetter
+    - reassign
+    - recvcheck
     - revive
-    - stylecheck
-    - tenv
+    - rowserrcheck
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - testifylint
     - unconvert
     - usestdlibvars
     - wastedassign
-  presets:
-    - bugs
-    - performance
-
-linters-settings:
-  gci:
-    sections:
-      - standard
-      - default
-      - prefix(github.com/curioswitch/go-build)
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
-        - errchkjson
-        - gosec
-        - noctx
+    - zerologlint
+  exclusions:
+    presets:
+      - comments
+    rules:
+      - linters:
+          - errcheck
+          - errchkjson
+          - gosec
+          - noctx
+        path: _test\.go
+formatters:
+  enable:
+    - gci
+    - gofumpt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/curioswitch/go-build)
