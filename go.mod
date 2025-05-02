@@ -1,6 +1,6 @@
 module github.com/curioswitch/go-build
 
-go 1.21
+go 1.22.0
 
 require (
 	github.com/goyek/goyek/v2 v2.3.0
