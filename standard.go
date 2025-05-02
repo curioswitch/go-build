@@ -159,7 +159,7 @@ func DefineTasks(opts ...Option) {
 			Name:  "test-go",
 			Usage: "Runs Go unit tests.",
 			Action: func(a *goyek.A) {
-				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil { //nolint:gosec // Common to have build artifacts viewable
+				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil { //nolint:gosec // common for build artifacts
 					a.Errorf("failed to create out directory: %v", err)
 					return
 				}
