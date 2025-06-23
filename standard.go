@@ -1,6 +1,7 @@
 package build
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -56,7 +57,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf(`go tool golangci-lint run --build-tags "%s" --timeout=20m %s`, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
+				execReviewdog(a, "golangci-lint", fmt.Sprintf(`go tool golangci-lint run --build-tags "%s" --timeout=20m %s`, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
 				goModTidyDiff(a)
 			},
 		}))
@@ -139,7 +140,7 @@ func DefineTasks(opts ...Option) {
 			Name:  "test-go",
 			Usage: "Runs Go unit tests.",
 			Action: func(a *goyek.A) {
-				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil { //nolint:gosec // common for build artifacts
+				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil {
 					a.Errorf("failed to create out directory: %v", err)
 					return
 				}
@@ -308,4 +309,16 @@ type buildTags struct {
 
 func (b buildTags) apply(c *config) {
 	c.buildTags = append(c.buildTags, b.tags...)
+}
+
+func execReviewdog(a *goyek.A, format string, cmdLine string, opts ...cmd.Option) bool {
+	// Check for same env var as reviewdog to use local run as it should never be.
+	if os.Getenv("CI_REPO_OWNER") == "" {
+		return cmd.Exec(a, cmdLine, opts...)
+	}
+	var stderr bytes.Buffer
+	if cmd.Exec(a, cmdLine, append(opts, cmd.Stderr(&stderr))...) {
+		return true
+	}
+	return cmd.Exec(a, fmt.Sprintf("go tool reviewdog -f=%s -fail-level=warning -reporter=github-check", format), cmd.Stdin(&stderr))
 }
