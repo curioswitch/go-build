@@ -40,6 +40,17 @@ i.e. if you already use `build` for transient artifacts. Note that these tasks
 use `out` for transient artifacts by default but can be configured for different
 paths.
 
+Tools are invoked using `go tool`. An entry should be added to `go.mod` for each
+tool you will use, commonly under `build/go.mod`. The default tools used are
+
+```
+github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+github.com/rhysd/actionlint/cmd/actionlint
+github.com/wasilibs/go-prettier/v3/cmd/prettier
+github.com/wasilibs/go-shellcheck/cmd/shellcheck
+github.com/wasilibs/go-yamllint/cmd/yamllint
+```
+
 A list of all tasks can be seen with `go run ./build -h`. The commonly used tasks
 will likely be:
 
