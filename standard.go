@@ -44,7 +44,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf(`go tool golangci-lint fmt %s`, strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, "go tool golangci-lint fmt "+strings.Join(golangciTargets, " "))
 				cmd.Exec(a, "go mod tidy")
 			},
 		}))
@@ -128,7 +128,7 @@ func DefineTasks(opts ...Option) {
 				if root == "" {
 					cmd.Exec(a, "go tool yamllint .")
 				} else {
-					cmd.Exec(a, fmt.Sprintf("go tool yamllint %s", target), cmd.Dir(root))
+					cmd.Exec(a, "go tool yamllint "+target, cmd.Dir(root))
 				}
 			},
 		}))
