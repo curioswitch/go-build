@@ -312,8 +312,7 @@ func (b buildTags) apply(c *config) {
 }
 
 func execReviewdog(a *goyek.A, format string, cmdLine string, opts ...cmd.Option) bool {
-	// Check for same env var as reviewdog to use local run as it should never be.
-	if os.Getenv("CI_REPO_OWNER") == "" {
+	if os.Getenv("CI") != "true" {
 		return cmd.Exec(a, cmdLine, opts...)
 	}
 	var stderr bytes.Buffer
