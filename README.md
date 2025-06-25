@@ -48,6 +48,7 @@ github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 github.com/rhysd/actionlint/cmd/actionlint
 github.com/wasilibs/go-prettier/v3/cmd/prettier
 github.com/reviewdog/reviewdog/cmd/reviewdog
+github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@v3.3.0
 github.com/wasilibs/go-shellcheck/cmd/shellcheck
 github.com/wasilibs/go-yamllint/cmd/yamllint
 ```
