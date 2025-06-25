@@ -22,7 +22,7 @@ jobs:
         os:
           - macos-13
           - macos-14
-          - ubuntu-22.04
+          - ubuntu-22.04`
           - windows-2022
         go:
           - ""
@@ -41,7 +41,7 @@ jobs:
             versions.go
 
       - name: run lints
-        if: startsWith(matrix.os, 'ubuntu-')
+        if: startsWith(matrix.os, 'ubuntu-') && matrix.go == ''
         run: go run build -v lint
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
