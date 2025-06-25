@@ -127,9 +127,9 @@ func DefineTasks(opts ...Option) {
 				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'")
 
 				if root == "" {
-					execReviewdog(conf, a, `-efm="%f:%l:%c: %m" -name=yamllint`, "go tool yamllint .")
+					execReviewdog(conf, a, `-efm="%f:%l:%c: %m" -name=yamllint`, "go tool yamllint --format parsable .")
 				} else {
-					execReviewdog(conf, a, `-efm="%f:%l:%c: %m" -name=yamllint`, "go tool yamllint "+target, cmd.Dir(root))
+					execReviewdog(conf, a, `-efm="%f:%l:%c: %m" -name=yamllint`, "go tool yamllint --format parsable "+target, cmd.Dir(root))
 				}
 			},
 		}))
