@@ -47,6 +47,7 @@ tool you will use, commonly under `build/go.mod`. The default tools used are
 github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 github.com/rhysd/actionlint/cmd/actionlint
 github.com/wasilibs/go-prettier/v3/cmd/prettier
+github.com/reviewdog/reviewdog/cmd/reviewdog
 github.com/wasilibs/go-shellcheck/cmd/shellcheck
 github.com/wasilibs/go-yamllint/cmd/yamllint
 ```
