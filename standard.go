@@ -187,6 +187,25 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
+	if !conf.excluded("get-tools") {
+		goyek.Define(goyek.Task{
+			Name:  "get-tools",
+			Usage: "Adds default set of tools to build/go.mod",
+			Action: func(a *goyek.A) {
+				tools := []string{
+					"github.com/golangci/golangci-lint/v2/cmd/golangci-lint",
+					"github.com/reviewdog/reviewdog/cmd/reviewdog",
+					"github.com/rhysd/actionlint/cmd/actionlint",
+					"github.com/suzuki-shunsuke/pinact/v3/cmd/pinact",
+					"github.com/wasilibs/go-prettier/v3/cmd/prettier",
+					"github.com/wasilibs/go-shellcheck/cmd/shellcheck",
+					"github.com/wasilibs/go-yamllint/cmd/yamllint",
+				}
+				cmd.Exec(a, "go get -tool "+strings.Join(tools, " "), cmd.Dir("build"))
+			},
+		})
+	}
+
 	goyek.Define(goyek.Task{
 		Name:  "format",
 		Usage: "Format code in various languages.",

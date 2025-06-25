@@ -53,6 +53,9 @@ github.com/wasilibs/go-shellcheck/cmd/shellcheck
 github.com/wasilibs/go-yamllint/cmd/yamllint
 ```
 
+The command `go run ./build get-tools` can be used to automatically add default
+tools to `go.mod`.
+
 A list of all tasks can be seen with `go run ./build -h`. The commonly used tasks
 will likely be:
 
