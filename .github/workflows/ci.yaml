@@ -20,8 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-13
-          - macos-14
+          - macos-15
           - ubuntu-24.04
           - windows-2025
         go:
@@ -36,17 +35,15 @@ jobs:
         with:
           go-version-file: ${{ !matrix.go && 'go.work' || '' }}
           go-version: ${{ matrix.go }}
-          cache-dependency-path: |
-            **/go.sum
-            versions.go
+          cache-dependency-path: "**/go.mod"
 
       - name: run lints
         if: startsWith(matrix.os, 'ubuntu-') && matrix.go == ''
         run: go run build -v lint
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: run tests
         run: go run build -v test
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
