@@ -1,6 +1,7 @@
 package build
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -56,7 +57,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf(`go tool golangci-lint run --build-tags "%s" --timeout=20m %s`, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
+				execReviewdog(conf, a, "-f=golangci-lint -name=golangci-lint", fmt.Sprintf(`go tool golangci-lint run --build-tags "%s" --timeout=20m %s`, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
 				goModTidyDiff(a)
 			},
 		}))
@@ -217,9 +218,10 @@ func DefineTasks(opts ...Option) {
 }
 
 type config struct {
-	artifactsPath string
-	excludeTasks  []string
-	buildTags     []string
+	artifactsPath    string
+	excludeTasks     []string
+	buildTags        []string
+	disableReviewdog bool
 }
 
 func (c *config) excluded(task string) bool {
@@ -308,4 +310,27 @@ type buildTags struct {
 
 func (b buildTags) apply(c *config) {
 	c.buildTags = append(c.buildTags, b.tags...)
+}
+
+// DisableReviewdog returns an Option to disable the use of reviewdog to process lint output.
+// By default, reviewdog is used to report lint issues as GitHub checks.
+func DisableReviewdog() Option {
+	return disableReviewdog{}
+}
+
+type disableReviewdog struct{}
+
+func (d disableReviewdog) apply(conf *config) {
+	conf.disableReviewdog = true
+}
+
+func execReviewdog(conf config, a *goyek.A, format string, cmdLine string, opts ...cmd.Option) bool {
+	if conf.disableReviewdog || os.Getenv("CI") != "true" {
+		return cmd.Exec(a, cmdLine, opts...)
+	}
+	var stderr bytes.Buffer
+	if cmd.Exec(a, cmdLine, append(opts, cmd.Stderr(&stderr))...) {
+		return true
+	}
+	return cmd.Exec(a, fmt.Sprintf("go tool reviewdog %s -fail-level=warning -reporter=github-check", format), cmd.Stdin(&stderr))
 }
