@@ -127,9 +127,9 @@ func DefineTasks(opts ...Option) {
 				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'")
 
 				if root == "" {
-					execReviewdog(conf, a, `-efm="%f:%l:%c: %m" -name=yamllint`, "go tool yamllint --format parsable .")
+					cmd.Exec(a, "go tool yamllint --format parsable .")
 				} else {
-					execReviewdog(conf, a, `-efm="%f:%l:%c: %m" -name=yamllint`, "go tool yamllint --format parsable "+target, cmd.Dir(root))
+					cmd.Exec(a, "go tool yamllint --format parsable "+target, cmd.Dir(root))
 				}
 			},
 		}))
@@ -140,7 +140,7 @@ func DefineTasks(opts ...Option) {
 			Name:  "test-go",
 			Usage: "Runs Go unit tests.",
 			Action: func(a *goyek.A) {
-				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil {
+				if err := os.MkdirAll(conf.artifactsPath, 0o755); err != nil { //nolint:gosec // common for build artifacts
 					a.Errorf("failed to create out directory: %v", err)
 					return
 				}
