@@ -1,4 +1,4 @@
 rules:
   document-start: disable
   truthy:
-    check-keys: false
+    check-keys: true
