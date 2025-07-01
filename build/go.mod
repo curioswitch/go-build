@@ -14,7 +14,7 @@ tool (
 
 require (
 	github.com/curioswitch/go-build v0.0.0-20220104000000-000000000000
-	github.com/goyek/x v0.2.0
+	github.com/goyek/x v0.3.0
 )
 
 require (
