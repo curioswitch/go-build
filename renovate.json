@@ -3,6 +3,8 @@
   "extends": [
     "helpers:pinGitHubActionDigests"
   ],
+  "platform": "github",
+  "platformCommit": true,
   "labels": ["dependencies"],
   "allowedCommands": [
     "^go work sync$",
