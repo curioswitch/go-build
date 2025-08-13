@@ -1,9 +1,21 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "helpers:pinGitHubActionDigests",
-    "group:all"
+    "helpers:pinGitHubActionDigests"
   ],
+  "labels": ["dependencies"],
+  "allowedCommands": [
+    "^go work sync$",
+    "^go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'$"
+  ],
+  "postUpgradeTasks": {
+    "commands": [
+      "go work sync",
+      "go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'"
+    ],
+    "fileFilters": ["**/go.mod", "**/go.sum"],
+    "executionMode": "branch"
+  },
   "customManagers": [
     {
       "customType": "regex",
@@ -14,10 +26,14 @@
       ]
     }
   ],
-  "github-actions": {
-    "groupName": "GitHub Actions"
-  },
-  "gomod": {
-    "groupName": "Go dependencies"
-  }
+  "packageRules": [
+    {
+      "matchDatasources": ["go"],
+      "groupName": "Go dependencies"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    }
+  ]
 }
