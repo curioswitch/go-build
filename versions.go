@@ -1,7 +1,8 @@
 package build
 
 const (
-	verActionlint   = "v1.7.7"
+	// renovate: github.com/rhysd/actionlint
+	verActionlint   = "v1.7.6"
 	verGolangCILint = "v2.3.1"
 	verGoPrettier   = "v3.6.2"
 	verGoShellcheck = "v0.10.0"
