@@ -1,0 +1,31 @@
+name: Renovate Dependencies
+
+on:
+  schedule:
+    # https://crontab.guru/#5_12_*_*_1
+    - cron: "5 12 * * 1"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/create-github-app-token@0f859bf9e69e887678d5bbfbee594437cb440ffe # v1
+        id: app-token
+        with:
+          app-id: "1047503"
+          private-key: $${{ secrets.CURIOSWITCH_APP_KEY }}
+
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.work
+
+      - uses: renovatebot/github-action@e3c9b63dabe11d616d9a5e9c19064ec6560369c0 # v43.0.6
+        with:
+          configurationFile: renovate.json
+          token: ${{ steps.app-token.outputs.token }}
