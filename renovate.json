@@ -3,6 +3,7 @@
   "extends": [
     "helpers:pinGitHubActionDigests"
   ],
+  "repositories": ["curioswitch/go-build"],
   "platform": "github",
   "platformCommit": true,
   "labels": ["dependencies"],
