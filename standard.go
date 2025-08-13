@@ -30,6 +30,34 @@ func DefineTasks(opts ...Option) {
 		o.apply(&conf)
 	}
 
+	if conf.verActionlint == "" {
+		conf.verActionlint = verActionlint
+	}
+
+	if conf.verGolangCILint == "" {
+		conf.verGolangCILint = verGolangCILint
+	}
+
+	if conf.verGoPrettier == "" {
+		conf.verGoPrettier = verGoPrettier
+	}
+
+	if conf.verGoShellcheck == "" {
+		conf.verGoShellcheck = verGoShellcheck
+	}
+
+	if conf.verGoYamllint == "" {
+		conf.verGoYamllint = verGoYamllint
+	}
+
+	if conf.verPinact == "" {
+		conf.verPinact = verPinact
+	}
+
+	if conf.verReviewdog == "" {
+		conf.verReviewdog = verReviewdog
+	}
+
 	golangciTargets := []string{"./..."}
 	// Uses of go-build will very commonly have a build folder, if it is also a module,
 	// then let's automatically run checks on it.
@@ -45,7 +73,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool golangci-lint fmt "+strings.Join(golangciTargets, " "))
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s fmt %s`, conf.verGolangCILint, strings.Join(golangciTargets, " ")))
 				cmd.Exec(a, "go mod tidy")
 			},
 		}))
@@ -57,8 +85,10 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				execReviewdog(conf, a, "-f=golangci-lint -name=golangci-lint", fmt.Sprintf(`go tool golangci-lint run --build-tags "%s" --timeout=20m %s`, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
-				goModTidyDiff(a)
+				execReviewdog(conf, a, "-f=golangci-lint -name=golangci-lint",
+					fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s run --build-tags "%s" --timeout=20m %s`,
+						conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, "go mod tidy -diff")
 			},
 		}))
 	}
@@ -69,7 +99,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --write '**/*.md'")
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -80,7 +110,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --check '**/*.md'")
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -91,7 +121,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'")
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -102,7 +132,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'")
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -113,7 +143,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'")
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", conf.verGoPrettier))
 			},
 		}))
 	}
@@ -124,12 +154,12 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool prettier --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'")
+				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", conf.verGoPrettier))
 
 				if root == "" {
-					cmd.Exec(a, "go tool yamllint .")
+					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", conf.verGoYamllint))
 				} else {
-					cmd.Exec(a, "go tool yamllint "+target, cmd.Dir(root))
+					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s %s", conf.verGoYamllint, target), cmd.Dir(root))
 				}
 			},
 		}))
@@ -181,29 +211,10 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints GitHub Actions workflows.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, "go tool pinact run -check")
-				cmd.Exec(a, `go tool actionlint -shellcheck="go tool shellcheck"`)
+				cmd.Exec(a, fmt.Sprintf("go run github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@%s run -check", conf.verPinact))
+				cmd.Exec(a, fmt.Sprintf(`go run github.com/rhysd/actionlint/cmd/actionlint@%s -shellcheck="go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@%s"`, conf.verActionlint, conf.verGoShellcheck))
 			},
 		}))
-	}
-
-	if !conf.excluded("get-tools") {
-		goyek.Define(goyek.Task{
-			Name:  "get-tools",
-			Usage: "Adds default set of tools to build/go.mod",
-			Action: func(a *goyek.A) {
-				tools := []string{
-					"github.com/golangci/golangci-lint/v2/cmd/golangci-lint",
-					"github.com/reviewdog/reviewdog/cmd/reviewdog",
-					"github.com/rhysd/actionlint/cmd/actionlint",
-					"github.com/suzuki-shunsuke/pinact/v3/cmd/pinact",
-					"github.com/wasilibs/go-prettier/v3/cmd/prettier",
-					"github.com/wasilibs/go-shellcheck/cmd/shellcheck",
-					"github.com/wasilibs/go-yamllint/cmd/yamllint",
-				}
-				cmd.Exec(a, "go get -tool "+strings.Join(tools, " "), cmd.Dir("build"))
-			},
-		})
 	}
 
 	goyek.Define(goyek.Task{
@@ -242,6 +253,14 @@ type config struct {
 	excludeTasks     []string
 	buildTags        []string
 	disableReviewdog bool
+
+	verActionlint   string
+	verGolangCILint string
+	verGoPrettier   string
+	verGoYamllint   string
+	verGoShellcheck string
+	verPinact       string
+	verReviewdog    string
 }
 
 func (c *config) excluded(task string) bool {
@@ -352,5 +371,89 @@ func execReviewdog(conf config, a *goyek.A, format string, cmdLine string, opts 
 	if cmd.Exec(a, cmdLine, append(opts, cmd.Stderr(&stderr))...) {
 		return true
 	}
-	return cmd.Exec(a, fmt.Sprintf("go tool reviewdog %s -fail-level=warning -reporter=github-check", format), cmd.Stdin(&stderr))
+	return cmd.Exec(a, fmt.Sprintf("go github.com/reviewdog/reviewdog/cmd/reviewdog@%s %s -fail-level=warning -reporter=github-check", conf.verReviewdog, format), cmd.Stdin(&stderr))
+}
+
+// VersionActionlint returns an Option to set the version of actionlint to use. If unset,
+// a default version is used which may not be the latest.
+func VersionActionlint(version string) Option {
+	return versionActionlint(version)
+}
+
+type versionActionlint string
+
+func (v versionActionlint) apply(c *config) {
+	c.verActionlint = string(v)
+}
+
+// VersionGolangCILint returns an Option to set the version of golangci-lint to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGolangCILint(version string) Option {
+	return versionGolangCILint(version)
+}
+
+type versionGolangCILint string
+
+func (v versionGolangCILint) apply(c *config) {
+	c.verGolangCILint = string(v)
+}
+
+// VersionGoPrettier returns an Option to set the version of go-prettier to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoPrettier(version string) Option {
+	return versionGoPrettier(version)
+}
+
+type versionGoPrettier string
+
+func (v versionGoPrettier) apply(c *config) {
+	c.verGoPrettier = string(v)
+}
+
+// VersionGoShellcheck returns an Option to set the version of go-shellcheck to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoShellcheck(version string) Option {
+	return versionGoShellcheck(version)
+}
+
+type versionGoShellcheck string
+
+func (v versionGoShellcheck) apply(c *config) {
+	c.verGoShellcheck = string(v)
+}
+
+// VersionGoYamllint returns an Option to set the version of go-yamllint to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoYamllint(version string) Option {
+	return versionGoYamllint(version)
+}
+
+type versionGoYamllint string
+
+func (v versionGoYamllint) apply(c *config) {
+	c.verGoYamllint = string(v)
+}
+
+// VersionPinact returns an Option to set the version of pinact to use. If unset,
+// a default version is used which may not be the latest.
+func VersionPinact(version string) Option {
+	return versionPinact(version)
+}
+
+type versionPinact string
+
+func (v versionPinact) apply(c *config) {
+	c.verPinact = string(v)
+}
+
+// VersionReviewdog returns an Option to set the version of reviewdog to use. If unset,
+// a default version is used which may not be the latest.
+func VersionReviewdog(version string) Option {
+	return versionReviewdog(version)
+}
+
+type versionReviewdog string
+
+func (v versionReviewdog) apply(c *config) {
+	c.verReviewdog = string(v)
 }
