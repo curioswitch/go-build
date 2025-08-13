@@ -27,6 +27,10 @@ Note that the goyek default of non-verbose output is overridden since it seems
 generally better to have verbose output. `-v=false` should be passed to a build
 command to disable verbose output.
 
+_`go tool` is not used because it does not provide stable dependencies. Indeed, popular CLIs
+such as buf and golangci-lint explicitly tell not to use it. Unless the feature gets
+fundamental fixes, it will never be supported._
+
 ## Usage
 
 The simplest way to use this library is to copy the contents of [build](./build)
@@ -39,22 +43,6 @@ Using the folder `build` is a goyek convention, but any folder name will work,
 i.e. if you already use `build` for transient artifacts. Note that these tasks
 use `out` for transient artifacts by default but can be configured for different
 paths.
-
-Tools are invoked using `go tool`. An entry should be added to `go.mod` for each
-tool you will use, commonly under `build/go.mod`. The default tools used are
-
-```
-github.com/golangci/golangci-lint/v2/cmd/golangci-lint
-github.com/rhysd/actionlint/cmd/actionlint
-github.com/wasilibs/go-prettier/v3/cmd/prettier
-github.com/reviewdog/reviewdog/cmd/reviewdog
-github.com/suzuki-shunsuke/pinact/v3/cmd/pinact
-github.com/wasilibs/go-shellcheck/cmd/shellcheck
-github.com/wasilibs/go-yamllint/cmd/yamllint
-```
-
-The command `go run ./build get-tools` can be used to automatically add default
-tools to `go.mod`.
 
 A list of all tasks can be seen with `go run ./build -h`. The commonly used tasks
 will likely be:
