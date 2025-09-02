@@ -30,3 +30,6 @@ jobs:
           renovate-version: full
           configurationFile: renovate.json
           token: ${{ steps.app-token.outputs.token }}
+        env:
+          RENOVATE_PLATFORM: github
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
