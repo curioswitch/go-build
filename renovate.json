@@ -3,14 +3,8 @@
   "extends": [
     "helpers:pinGitHubActionDigests"
   ],
-  "repositories": ["curioswitch/go-build"],
-  "platform": "github",
-  "platformCommit": true,
+  "platformCommit": "enabled",
   "labels": ["dependencies"],
-  "allowedCommands": [
-    "^go work sync$",
-    "^go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'$"
-  ],
   "postUpgradeTasks": {
     "commands": [
       "go work sync",
@@ -25,18 +19,18 @@
       "managerFilePatterns": ["/^versions.go$/"],
       "datasourceTemplate": "go",
       "matchStrings": [
-          "// renovate: (?<depName>.*)\\s+[^=]+=\\s*\"(?<currentValue>[^\"]*)\""
+        "// renovate: (?<depName>.*)\\s+[^=]+=\\s*\"(?<currentValue>[^\"]*)\""
       ]
     }
   ],
   "packageRules": [
-    {
-      "matchDatasources": ["go"],
-      "groupName": "Go dependencies"
+    { 
+      "matchDatasources": ["go"], 
+      "groupName": "Go dependencies" 
     },
-    {
-      "matchManagers": ["github-actions"],
-      "groupName": "GitHub Actions"
+    { 
+      "matchManagers": ["github-actions"], 
+      "groupName": "GitHub Actions" 
     }
   ]
 }
