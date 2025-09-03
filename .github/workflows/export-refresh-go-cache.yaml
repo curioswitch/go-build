@@ -32,9 +32,11 @@ jobs:
       - name: resolve environment
         id: goenv
         run: |
-          echo "go_cache=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
-          echo "go_modcache=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
-          echo "go_version=$(go env GOVERSION)" >> "$GITHUB_OUTPUT"
+          {
+            echo "go_cache=$(go env GOCACHE)"
+            echo "go_modcache=$(go env GOMODCACHE)"
+            echo "go_version=$(go env GOVERSION)"
+          } >> "GITHUB_OUTPUT"
 
       - uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
