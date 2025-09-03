@@ -10,6 +10,10 @@ on:
         type: string
         description: ID of GitHub app with contents write permission
         required: true
+      debug:
+        type: boolean
+        description: Whether to enable debug logging
+        default: false
     secrets:
       github_app_key:
         description: Private key of GitHub app with contents write permission
@@ -39,3 +43,4 @@ jobs:
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_ALLOWED_COMMANDS: "^go work sync$,^go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'$"
+          LOG_LEVEL: ${{ inputs.debug && 'DEBUG' || 'INFO' }}
