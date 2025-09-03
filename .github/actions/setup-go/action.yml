@@ -1,0 +1,31 @@
+name: Setup Go
+description: Setup Go using existing cache
+inputs:
+  go-version:
+    description: The Go version to use. If unset, go.work will be used.
+    required: false
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      with:
+        go-version-file: ${{ !inputs.go-version && 'go.work' || '' }}
+        go-version: ${{ inputs.go-version }}
+        cache: false
+
+    - name: resolve go environment
+      id: goenv
+      shell: bash
+      run: |
+        {
+          echo "go_cache=$(go env GOCACHE)"
+          echo "go_modcache=$(go env GOMODCACHE)"
+          echo "go_version=$(go env GOVERSION)"
+        } >> "$GITHUB_OUTPUT"
+
+    - uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+      with:
+        path: |
+          ${{ steps.goenv.outputs.go_modcache }}
+          ${{ steps.goenv.outputs.go_cache }}
+        key: go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}
