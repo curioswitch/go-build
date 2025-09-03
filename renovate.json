@@ -20,12 +20,24 @@
       "matchStrings": [
         "// renovate: (?<depName>.*)\\s+[^=]+=\\s*\"(?<currentValue>[^\"]*)\""
       ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^go.work$/"],
+      "datasourceTemplate": "golang-version",
+      "depNameTemplate": "go",
+      "depTypeTemplate": "golang",
+      "matchStrings": ["go (?<currentValue>[^\\s]+)"]
     }
   ],
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions"
+    },
+    {
+      "matchDatasources": ["golang-version"],
+      "groupName": "Go"
     },
     {
       "matchCategories": ["golang"],
