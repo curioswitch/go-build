@@ -111,7 +111,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s --no-error-on-unmatched-pattern --write '**/*.md'", runGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.md'")
 			},
 		}))
 	}
@@ -123,7 +123,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s --no-error-on-unmatched-pattern --check '**/*.md'", runGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.md'")
 			},
 		}))
 	}
@@ -135,7 +135,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", runGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'")
 			},
 		}))
 	}
@@ -147,7 +147,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", runGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'")
 			},
 		}))
 	}
@@ -159,7 +159,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Formats YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", runGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'")
 			},
 		}))
 	}
@@ -171,12 +171,12 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", runGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'")
 
 				if root == "" {
-					cmd.Exec(a, fmt.Sprintf("%s .", runGoYamllint))
+					cmd.Exec(a, runGoYamllint+" .")
 				} else {
-					cmd.Exec(a, fmt.Sprintf("%s %s", runGoYamllint, target), cmd.Dir(root))
+					cmd.Exec(a, runGoYamllint+" "+target, cmd.Dir(root))
 				}
 			},
 		}))
@@ -229,7 +229,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints GitHub Actions workflows.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("%s run -check", runPinact))
+				cmd.Exec(a, runPinact+" run -check")
 				cmd.Exec(a, fmt.Sprintf(`%s -shellcheck="%s"`, runActionlint, runGoShellcheck))
 			},
 		}))
