@@ -1,8 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "helpers:pinGitHubActionDigests"
-  ],
+  "extends": ["helpers:pinGitHubActionDigests"],
   "platformCommit": "enabled",
   "labels": ["dependencies"],
   "postUpgradeTasks": {
@@ -24,13 +22,22 @@
     }
   ],
   "packageRules": [
-    { 
-      "matchDatasources": ["go"], 
-      "groupName": "Go dependencies" 
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
     },
-    { 
-      "matchManagers": ["github-actions"], 
-      "groupName": "GitHub Actions" 
+    {
+      "matchCategories": ["golang"],
+      "groupName": "Go dependencies"
+    },
+    {
+      "matchCategories": ["js"],
+      "groupName": "Node dependencies"
+    },
+    {
+      "matchManagers": ["regex"],
+      "matchDatasources": ["go"],
+      "groupName": "Go tools"
     }
   ]
 }

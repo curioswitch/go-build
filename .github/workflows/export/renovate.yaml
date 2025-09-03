@@ -1,0 +1,41 @@
+# This workflow invokes renovate with an app token for creating PRs. It provides
+# some global configuration to match go-build's renovate configuration but is
+# otherwise quite small and may be better to copy instead of reference.
+name: Renovate Dependencies
+
+on:
+  workflow_call:
+    inputs:
+      github_app_id:
+        type: string
+        description: ID of GitHub app with contents write permission
+        required: true
+    secrets:
+      github_app_key:
+        description: Private key of GitHub app with contents write permission
+        required: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/create-github-app-token@a8d616148505b5069dccd32f177bb87d7f39123b # v2
+        id: app-token
+        with:
+          app-id: ${{ inputs.github_app_id }}
+          private-key: ${{ secrets.github_app_key }}
+
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: renovatebot/github-action@7876d7a812254599d262d62b6b2c2706018258a2 # v43.0.10
+        with:
+          renovate-version: full
+          configurationFile: renovate.json
+          token: ${{ steps.app-token.outputs.token }}
+        env:
+          RENOVATE_PLATFORM: github
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_ALLOWED_COMMANDS: "^go work sync$,^go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'$"
