@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "**/go.mod"
+      - versions.go
       - .github/workflows/export-refresh-go-cache.yaml
       - .github/workflows/refresh-go-cache.yaml
   workflow_dispatch:
