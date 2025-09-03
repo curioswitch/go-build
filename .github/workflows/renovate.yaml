@@ -8,7 +8,7 @@ on:
 
 jobs:
   renovate:
-    uses: ./.github/workflows/export/renovate.yaml
+    uses: ./.github/workflows/export-renovate.yaml
     with:
       github_app_id: "1047503"
     secrets:
