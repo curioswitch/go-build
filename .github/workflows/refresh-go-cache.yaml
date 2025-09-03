@@ -1,4 +1,4 @@
-name: Renovate Dependencies
+name: Refresh Go Cache
 
 on:
   push:
