@@ -15,7 +15,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^versions.go$/"],
+      "managerFilePatterns": ["/(^|/)versions.go$/"],
       "datasourceTemplate": "go",
       "matchStrings": [
         "// renovate: (?<depName>.*)\\s+[^=]+=\\s*\"(?<currentValue>[^\"]*)\""
