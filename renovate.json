@@ -3,6 +3,7 @@
   "extends": ["helpers:pinGitHubActionDigests"],
   "platformCommit": "enabled",
   "labels": ["dependencies"],
+  "prHourlyLimit": 0,
   "postUpgradeTasks": {
     "commands": [
       "go work sync",
