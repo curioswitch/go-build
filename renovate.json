@@ -41,6 +41,7 @@
     },
     {
       "matchCategories": ["golang"],
+      "matchDatasources": ["go"],
       "groupName": "Go dependencies"
     },
     {
