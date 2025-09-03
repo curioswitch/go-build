@@ -1,0 +1,30 @@
+name: Renovate Dependencies
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/go.mod"
+      - .github/workflows/export-refresh-go-cache.yaml
+      - .github/workflows/refresh-go-cache.yaml
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-15
+          - ubuntu-24.04
+          - windows-2025
+        go:
+          - ""
+        include:
+          - os: ubuntu-24.04
+            go: stable
+    uses: ./.github/workflows/export-refresh-go-cache.yaml
+    with:
+      runner: ${{ matrix.os }}
+      go: ${{ matrix.go }}
