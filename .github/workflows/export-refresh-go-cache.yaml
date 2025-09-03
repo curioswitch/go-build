@@ -31,6 +31,7 @@ jobs:
 
       - name: resolve environment
         id: goenv
+        shell: bash
         run: |
           {
             echo "go_cache=$(go env GOCACHE)"
