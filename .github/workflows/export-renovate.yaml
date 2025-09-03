@@ -1,7 +1,7 @@
 # This workflow invokes renovate with an app token for creating PRs. It provides
 # some global configuration to match go-build's renovate configuration but is
 # otherwise quite small and may be better to copy instead of reference.
-name: Renovate Dependencies
+name: Renovate Dependencies (Export)
 
 on:
   workflow_call:
@@ -16,7 +16,7 @@ on:
         required: true
 
 jobs:
-  sync:
+  renovate:
     runs-on: ubuntu-24.04
 
     steps:
