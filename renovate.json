@@ -32,10 +32,6 @@
       "groupName": "Go dependencies"
     },
     {
-      "matchCategories": ["js"],
-      "groupName": "Node dependencies"
-    },
-    {
       "matchManagers": ["regex"],
       "matchDatasources": ["go"],
       "groupName": "Go tools"
