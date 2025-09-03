@@ -1,0 +1,44 @@
+# This workflow refreshes the CI cache for Go by download mod dependencies
+# and tools.
+name: Refresh Go Cache (Export)
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        description: The runner to refresh cache for
+        default: ubuntu-24.04
+      go:
+        type: string
+        description: The Go version to refresh cache for. If unset, reads from go.work
+        default: ""
+
+jobs:
+  refresh:
+    runs-on: ${{ inputs.runner }}
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: ${{ !inputs.go && 'go.work' || '' }}
+          go-version: ${{ inputs.go }}
+          cache: false
+
+      - run: go run ./build download
+
+      - name: resolve environment
+        id: goenv
+        run: |
+          echo "go_cache=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
+          echo "go_modcache=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+          echo "go_version=$(go env GOVERSION)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ steps.goenv.outputs.go_modcache }}
+            ${{ steps.goenv.outputs.go_cache }}
+          key: go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}

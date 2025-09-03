@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -68,6 +69,7 @@ func DefineTasks(opts ...Option) {
 	root, target := pathRelativeToRoot()
 
 	if !conf.excluded("format-go") {
+		RegisterModuleDownloads("github.com/golangci/golangci-lint/v2@" + conf.verGolangCILint)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-go",
 			Usage:    "Formats Go code.",
@@ -80,6 +82,10 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-go") {
+		RegisterModuleDownloads(
+			"github.com/golangci/golangci-lint/v2@"+conf.verGolangCILint,
+			"github.com/reviewdog/reviewdog@"+conf.verReviewdog,
+		)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-go",
 			Usage:    "Lints Go code.",
@@ -94,6 +100,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-markdown") {
+		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-markdown",
 			Usage:    "Formats Markdown code.",
@@ -105,6 +112,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-markdown") {
+		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-markdown",
 			Usage:    "Lints Markdown code.",
@@ -116,6 +124,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-shell") {
+		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-shell",
 			Usage:    "Formats shell-like code, including Dockerfile, ignore, dotenv.",
@@ -127,6 +136,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-shell") {
+		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-shell",
 			Usage:    "Lints shell-like code, including Dockerfile, ignore, dotenv.",
@@ -138,6 +148,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-yaml") {
+		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-yaml",
 			Usage:    "Formats YAML code.",
@@ -149,6 +160,10 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-yaml") {
+		RegisterModuleDownloads(
+			"github.com/wasilibs/go-prettier/v3@"+conf.verGoPrettier,
+			"github.com/wasilibs/go-yamllint@"+conf.verGoYamllint,
+		)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-yaml",
 			Usage:    "Lints YAML code.",
@@ -206,6 +221,10 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-github") && fileExists(".github") {
+		RegisterModuleDownloads(
+			"github.com/suzuki-shunsuke/pinact/v3@"+conf.verPinact,
+			"github.com/rhysd/actionlint@"+conf.verActionlint,
+		)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-github",
 			Usage:    "Lints GitHub Actions workflows.",
@@ -216,6 +235,15 @@ func DefineTasks(opts ...Option) {
 			},
 		}))
 	}
+
+	goyek.Define(goyek.Task{
+		Name:  "download",
+		Usage: "Downloads build dependencies.",
+		Action: func(a *goyek.A) {
+			cmd.Exec(a, "go mod download")
+			cmd.Exec(a, "go mod download "+strings.Join(slices.Collect(maps.Keys(moduleDownloads)), " "))
+		},
+	})
 
 	goyek.Define(goyek.Task{
 		Name:  "format",

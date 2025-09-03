@@ -9,6 +9,8 @@ var (
 	generateTasks goyek.Deps
 	lintTasks     goyek.Deps
 	testTasks     goyek.Deps
+
+	moduleDownloads = map[string]struct{}{}
 )
 
 // RegisterFormatTask adds a task that should be run during the format command.
@@ -29,4 +31,11 @@ func RegisterLintTask(task *goyek.DefinedTask) {
 // RegisterTestTask adds a task that should be run during the test command.
 func RegisterTestTask(task *goyek.DefinedTask) {
 	testTasks = append(testTasks, task)
+}
+
+// RegisterModuleDownloads registers the module to be downloaded by the download command.
+func RegisterModuleDownloads(modules ...string) {
+	for _, module := range modules {
+		moduleDownloads[module] = struct{}{}
+	}
 }
