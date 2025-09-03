@@ -8,11 +8,11 @@ const (
 	// renovate: github.com/wasilibs/go-prettier/v3
 	verGoPrettier = "v3.6.2"
 	// renovate: github.com/wasilibs/go-shellcheck
-	verGoShellcheck = "v0.10.0"
+	verGoShellcheck = "v0.11.0"
 	// renovate: github.com/wasilibs/go-yalllint
 	verGoYamllint = "v1.35.1"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
-	verPinact = "v3.4.1"
+	verPinact = "v3.4.2"
 	// renovate: github.com/reviewdog/reviewdog
 	verReviewdog = "v0.20.3"
 )
