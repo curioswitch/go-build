@@ -5,9 +5,14 @@ const (
 	verActionlint = "v1.7.7"
 	// renovate: github.com/golangci/golangci-lint/v2
 	verGolangCILint = "v2.4.0"
-	verGoPrettier   = "v3.6.2"
+	// renovate: github.com/wasilibs/go-prettier/v3
+	verGoPrettier = "v3.6.2"
+	// renovate: github.com/wasilibs/go-shellcheck
 	verGoShellcheck = "v0.10.0"
-	verGoYamllint   = "v1.35.1"
-	verPinact       = "v3.4.1"
-	verReviewdog    = "v0.20.3"
+	// renovate: github.com/wasilibs/go-yalllint
+	verGoYamllint = "v1.35.1"
+	// renovate: github.com/suzuki-shunsuke/pinact/v3
+	verPinact = "v3.4.1"
+	// renovate: github.com/reviewdog/reviewdog
+	verReviewdog = "v0.20.3"
 )
