@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"maps"
+	"io"
 	"os"
 	"path/filepath"
 	"slices"
@@ -68,30 +68,35 @@ func DefineTasks(opts ...Option) {
 
 	root, target := pathRelativeToRoot()
 
+	runActionlint := "go run github.com/rhysd/actionlint/cmd/actionlint@" + conf.verActionlint
+	runGolangCILint := "go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@" + conf.verGolangCILint
+	runGoPrettier := "go run github.com/wasilibs/go-prettier/v3/cmd/prettier@" + conf.verGoPrettier
+	runGoShellcheck := "go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@" + conf.verGoShellcheck
+	runGoYamllint := "go run github.com/wasilibs/go-yamllint/cmd/yamllint@" + conf.verGoYamllint
+	runPinact := "go run github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@" + conf.verPinact
+	runReviewDog := "go run github.com/reviewdog/reviewdog/cmd/reviewdog@" + conf.verReviewdog
+
 	if !conf.excluded("format-go") {
-		RegisterModuleDownloads("github.com/golangci/golangci-lint/v2@" + conf.verGolangCILint)
+		RegisterCommandDownloads(runGolangCILint)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-go",
 			Usage:    "Formats Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s fmt %s`, conf.verGolangCILint, strings.Join(golangciTargets, " ")))
+				cmd.Exec(a, fmt.Sprintf(`%s fmt %s`, runGolangCILint, strings.Join(golangciTargets, " ")))
 				cmd.Exec(a, "go mod tidy")
 			},
 		}))
 	}
 
 	if !conf.excluded("lint-go") {
-		RegisterModuleDownloads(
-			"github.com/golangci/golangci-lint/v2@"+conf.verGolangCILint,
-			"github.com/reviewdog/reviewdog@"+conf.verReviewdog,
-		)
+		RegisterCommandDownloads(runGolangCILint, runReviewDog+" -version")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-go",
 			Usage:    "Lints Go code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				execReviewdog(conf, a, "-f=golangci-lint -name=golangci-lint",
+				execReviewdog(conf, a, runReviewDog, "-f=golangci-lint -name=golangci-lint",
 					fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s run --build-tags "%s" --timeout=20m %s`,
 						conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
 				cmd.Exec(a, "go mod tidy -diff")
@@ -100,81 +105,78 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-markdown") {
-		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
+		RegisterCommandDownloads(runGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-markdown",
 			Usage:    "Formats Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.md'", conf.verGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.md'")
 			},
 		}))
 	}
 
 	if !conf.excluded("lint-markdown") {
-		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
+		RegisterCommandDownloads(runGoPrettier)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-markdown",
 			Usage:    "Lints Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.md'", conf.verGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.md'")
 			},
 		}))
 	}
 
 	if !conf.excluded("format-shell") {
-		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
+		RegisterCommandDownloads(runGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-shell",
 			Usage:    "Formats shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", conf.verGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'")
 			},
 		}))
 	}
 
 	if !conf.excluded("lint-shell") {
-		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
+		RegisterCommandDownloads(runGoPrettier)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-shell",
 			Usage:    "Lints shell-like code, including Dockerfile, ignore, dotenv.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'", conf.verGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.sh' '**/*.bash' '**/Dockerfile' '**/*.dockerfile' '**/.*ignore' '**/.env*'")
 			},
 		}))
 	}
 
 	if !conf.excluded("format-yaml") {
-		RegisterModuleDownloads("github.com/wasilibs/go-prettier/v3@" + conf.verGoPrettier)
+		RegisterCommandDownloads(runGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-yaml",
 			Usage:    "Formats YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'", conf.verGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'")
 			},
 		}))
 	}
 
 	if !conf.excluded("lint-yaml") {
-		RegisterModuleDownloads(
-			"github.com/wasilibs/go-prettier/v3@"+conf.verGoPrettier,
-			"github.com/wasilibs/go-yamllint@"+conf.verGoYamllint,
-		)
+		RegisterCommandDownloads(runGoPrettier, runGoYamllint+" -v")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-yaml",
 			Usage:    "Lints YAML code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-prettier/v3/cmd/prettier@%s --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'", conf.verGoPrettier))
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'")
 
 				if root == "" {
-					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s .", conf.verGoYamllint))
+					cmd.Exec(a, runGoYamllint+" .")
 				} else {
-					cmd.Exec(a, fmt.Sprintf("go run github.com/wasilibs/go-yamllint/cmd/yamllint@%s %s", conf.verGoYamllint, target), cmd.Dir(root))
+					cmd.Exec(a, runGoYamllint+" "+target, cmd.Dir(root))
 				}
 			},
 		}))
@@ -221,17 +223,14 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-github") && fileExists(".github") {
-		RegisterModuleDownloads(
-			"github.com/suzuki-shunsuke/pinact/v3@"+conf.verPinact,
-			"github.com/rhysd/actionlint@"+conf.verActionlint,
-		)
+		RegisterCommandDownloads(runPinact, runActionlint)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-github",
 			Usage:    "Lints GitHub Actions workflows.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, fmt.Sprintf("go run github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@%s run -check", conf.verPinact))
-				cmd.Exec(a, fmt.Sprintf(`go run github.com/rhysd/actionlint/cmd/actionlint@%s -shellcheck="go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@%s"`, conf.verActionlint, conf.verGoShellcheck))
+				cmd.Exec(a, runPinact+" run -check")
+				cmd.Exec(a, fmt.Sprintf(`%s -shellcheck="%s"`, runActionlint, runGoShellcheck))
 			},
 		}))
 	}
@@ -241,7 +240,9 @@ func DefineTasks(opts ...Option) {
 		Usage: "Downloads build dependencies.",
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, "go mod download")
-			cmd.Exec(a, "go mod download "+strings.Join(slices.Collect(maps.Keys(moduleDownloads)), " "))
+			for c := range commandDownloads {
+				cmd.Exec(a, c, cmd.Stdout(io.Discard))
+			}
 		},
 	})
 
@@ -391,7 +392,7 @@ func (d disableReviewdog) apply(conf *config) {
 	conf.disableReviewdog = true
 }
 
-func execReviewdog(conf config, a *goyek.A, format string, cmdLine string, opts ...cmd.Option) bool {
+func execReviewdog(conf config, a *goyek.A, runReviewdog string, format string, cmdLine string, opts ...cmd.Option) bool {
 	if conf.disableReviewdog || os.Getenv("CI") != "true" {
 		return cmd.Exec(a, cmdLine, opts...)
 	}
@@ -399,7 +400,7 @@ func execReviewdog(conf config, a *goyek.A, format string, cmdLine string, opts 
 	if cmd.Exec(a, cmdLine, append(opts, cmd.Stderr(&stderr))...) {
 		return true
 	}
-	return cmd.Exec(a, fmt.Sprintf("go github.com/reviewdog/reviewdog/cmd/reviewdog@%s %s -fail-level=warning -reporter=github-check", conf.verReviewdog, format), cmd.Stdin(&stderr))
+	return cmd.Exec(a, fmt.Sprintf("%s %s -fail-level=warning -reporter=github-check", runReviewdog, format), cmd.Stdin(&stderr))
 }
 
 // VersionActionlint returns an Option to set the version of actionlint to use. If unset,
