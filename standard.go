@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 
@@ -240,8 +241,10 @@ func DefineTasks(opts ...Option) {
 		Usage: "Downloads build dependencies.",
 		Action: func(a *goyek.A) {
 			cmd.Exec(a, "go mod download")
-			for c := range commandDownloads {
-				cmd.Exec(a, c, cmd.Stdout(io.Discard))
+			if conf.downloadToolsAllOSes || runtime.GOOS == "linux" {
+				for c := range commandDownloads {
+					cmd.Exec(a, c, cmd.Stdout(io.Discard))
+				}
 			}
 		},
 	})
@@ -290,6 +293,8 @@ type config struct {
 	verGoShellcheck string
 	verPinact       string
 	verReviewdog    string
+
+	downloadToolsAllOSes bool
 }
 
 func (c *config) excluded(task string) bool {
@@ -485,4 +490,17 @@ type versionReviewdog string
 
 func (v versionReviewdog) apply(c *config) {
 	c.verReviewdog = string(v)
+}
+
+// DownloadToolsAllOSes returns an Option to download tools for all operating systems.
+// By default, the `download` task only downloads tools on Linux to reflect that it is
+// common to only run lints on Linux and tests on other OSes.
+func DownloadToolsAllOSes() Option {
+	return downloadToolsAllOSes{}
+}
+
+type downloadToolsAllOSes struct{}
+
+func (d downloadToolsAllOSes) apply(c *config) {
+	c.downloadToolsAllOSes = true
 }
