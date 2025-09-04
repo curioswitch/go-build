@@ -10,6 +10,9 @@
   },
   "settings": {
     "editor.tabSize": 2,
+    "files.associations": {
+      "renovate*.json": "jsonc"
+    },
     "[dockerfile]": {
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "foxundermoon.shell-format"
