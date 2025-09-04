@@ -1,53 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["helpers:pinGitHubActionDigests"],
-  "platformCommit": "enabled",
-  "labels": ["dependencies"],
-  "prHourlyLimit": 0,
-  "postUpgradeTasks": {
-    "commands": [
-      "go work sync",
-      "go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'"
-    ],
-    "fileFilters": ["**/go.mod", "**/go.sum"],
-    "executionMode": "branch"
-  },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": ["/(^|/)versions.go$/"],
-      "datasourceTemplate": "go",
-      "matchStrings": [
-        "// renovate: (?<depName>.*)\\s+[^=]+=\\s*\"(?<currentValue>[^\"]*)\""
-      ]
-    },
-    {
-      "customType": "regex",
-      "managerFilePatterns": ["/^go.work$/"],
-      "datasourceTemplate": "golang-version",
-      "depNameTemplate": "go",
-      "depTypeTemplate": "golang",
-      "matchStrings": ["go (?<currentValue>[^\\s]+)"]
-    }
-  ],
+  "extends": ["github>curioswitch/go-build:renovate-export"],
   "packageRules": [
     {
-      "matchManagers": ["github-actions"],
-      "groupName": "GitHub Actions"
-    },
-    {
+      // Maybe can enable someday if we can configure to update to n-1.
+      // https://github.com/renovatebot/renovate/discussions/22214
       "matchDatasources": ["golang-version"],
-      "groupName": "Go"
-    },
-    {
-      "matchCategories": ["golang"],
-      "matchDatasources": ["go"],
-      "groupName": "Go dependencies"
-    },
-    {
-      "matchManagers": ["regex"],
-      "matchDatasources": ["go"],
-      "groupName": "Go tools"
+      "enabled": false
     }
   ]
 }
