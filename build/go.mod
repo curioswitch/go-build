@@ -1,6 +1,6 @@
 module build
 
-go 1.24.4
+go 1.24.0
 
 require (
 	github.com/curioswitch/go-build v0.4.0
