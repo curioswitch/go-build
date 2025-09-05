@@ -65,8 +65,10 @@ func DefineTasks(opts ...Option) {
 
 	var golangciTargets []string
 	// Rare to not have a go.mod, except for a monorepo root where it's common.
+	hasGoMod := false
 	if fileExists("go.mod") {
 		golangciTargets = append(golangciTargets, "./...")
+		hasGoMod = true
 	}
 	// Uses of go-build will very commonly have a build folder, if it is also a module,
 	// then let's automatically run checks on it.
@@ -93,7 +95,9 @@ func DefineTasks(opts ...Option) {
 			Parallel: true,
 			Action: func(a *goyek.A) {
 				cmd.Exec(a, fmt.Sprintf(`%s fmt %s`, runGolangCILint, strings.Join(golangciTargets, " ")))
-				cmd.Exec(a, "go mod tidy")
+				if hasGoMod {
+					cmd.Exec(a, "go mod tidy")
+				}
 			},
 		}))
 	}
@@ -108,7 +112,9 @@ func DefineTasks(opts ...Option) {
 				execReviewdog(conf, a, runReviewDog, "-f=golangci-lint -name=golangci-lint",
 					fmt.Sprintf(`go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@%s run --build-tags "%s" --timeout=20m %s`,
 						conf.verGolangCILint, strings.Join(conf.buildTags, ","), strings.Join(golangciTargets, " ")))
-				cmd.Exec(a, "go mod tidy -diff")
+				if hasGoMod {
+					cmd.Exec(a, "go mod tidy -diff")
+				}
 			},
 		}))
 	}
