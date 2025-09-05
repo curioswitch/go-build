@@ -46,7 +46,7 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
-      - run: pnpx renovate@latest
+      - run: pnpm --allow-build re2 dlx renovate@latest
         env:
           RENOVATE_TOKEN: ${{ steps.app-token.outputs.token }}
           RENOVATE_PLATFORM: github
