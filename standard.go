@@ -25,42 +25,19 @@ func DefineTasks(opts ...Option) {
 	command := flag.String("cmd", "", "Command to execute with runall.")
 
 	conf := config{
-		artifactsPath: "out",
+		artifactsPath:   "out",
+		buildFolder:     "build",
+		verActionlint:   verActionlint,
+		verGolangCILint: verGolangCILint,
+		verGoPrettier:   verGoPrettier,
+		verGoShellcheck: verGoShellcheck,
+		verGoTestsum:    verGoTestsum,
+		verGoYamllint:   verGoYamllint,
+		verPinact:       verPinact,
+		verReviewdog:    verReviewdog,
 	}
 	for _, o := range opts {
 		o.apply(&conf)
-	}
-
-	if conf.verActionlint == "" {
-		conf.verActionlint = verActionlint
-	}
-
-	if conf.verGolangCILint == "" {
-		conf.verGolangCILint = verGolangCILint
-	}
-
-	if conf.verGoPrettier == "" {
-		conf.verGoPrettier = verGoPrettier
-	}
-
-	if conf.verGoShellcheck == "" {
-		conf.verGoShellcheck = verGoShellcheck
-	}
-
-	if conf.verGoTestsum == "" {
-		conf.verGoTestsum = verGoTestsum
-	}
-
-	if conf.verGoYamllint == "" {
-		conf.verGoYamllint = verGoYamllint
-	}
-
-	if conf.verPinact == "" {
-		conf.verPinact = verPinact
-	}
-
-	if conf.verReviewdog == "" {
-		conf.verReviewdog = verReviewdog
 	}
 
 	var golangciTargets []string
@@ -72,8 +49,8 @@ func DefineTasks(opts ...Option) {
 	}
 	// Uses of go-build will very commonly have a build folder, if it is also a module,
 	// then let's automatically run checks on it.
-	if fileExists(filepath.Join("build", "go.mod")) {
-		golangciTargets = append(golangciTargets, "./build")
+	if fileExists(filepath.Join(conf.buildFolder, "go.mod")) {
+		golangciTargets = append(golangciTargets, "./"+conf.buildFolder)
 	}
 
 	root, target := pathRelativeToRoot()
@@ -245,12 +222,9 @@ func DefineTasks(opts ...Option) {
 	}
 
 	goyek.Define(goyek.Task{
-		Name:  "download",
-		Usage: "Downloads build dependencies.",
+		Name:  "download-tools",
+		Usage: "Downloads tool dependencies for this module.",
 		Action: func(a *goyek.A) {
-			for _, dir := range modDirs(a) {
-				cmd.Exec(a, "go mod download", cmd.Dir(dir))
-			}
 			if conf.downloadToolsAllOSes || runtime.GOOS == "linux" {
 				for c := range commandDownloads {
 					cmd.Exec(a, c, cmd.Stdout(io.Discard))
@@ -259,6 +233,19 @@ func DefineTasks(opts ...Option) {
 			// Ignore downloadTools for gotestsum
 			if !conf.excluded("test-go") {
 				cmd.Exec(a, runGoTestsum+" -h", cmd.Stdout(io.Discard))
+			}
+		},
+	})
+
+	goyek.Define(goyek.Task{
+		Name:  "download",
+		Usage: "Downloads build dependencies for entire workspace.",
+		Action: func(a *goyek.A) {
+			for _, dir := range modDirs(a) {
+				cmd.Exec(a, "go mod download", cmd.Dir(dir))
+				if !strings.HasSuffix(dir, "/"+conf.buildFolder) {
+					cmd.Exec(a, fmt.Sprintf("go run ./%s download-tools", conf.buildFolder))
+				}
 			}
 		},
 	})
@@ -296,6 +283,7 @@ func DefineTasks(opts ...Option) {
 
 type config struct {
 	artifactsPath    string
+	buildFolder      string
 	excludeTasks     []string
 	buildTags        []string
 	disableReviewdog bool
@@ -332,6 +320,18 @@ type artifactsPath string
 
 func (a artifactsPath) apply(c *config) {
 	c.artifactsPath = string(a)
+}
+
+// BuildFolder sets the name fo the folder that contains build configuration. If not provided, the
+// default is "build".
+func BuildFolder(folder string) Option {
+	return buildFolder(folder)
+}
+
+type buildFolder string
+
+func (b buildFolder) apply(c *config) {
+	c.buildFolder = string(b)
 }
 
 // ExcludeTasks returns an Option to exclude tasks normally added by default. This can be used
