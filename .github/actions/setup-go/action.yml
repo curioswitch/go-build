@@ -29,3 +29,6 @@ runs:
           ${{ steps.goenv.outputs.go_modcache }}
           ${{ steps.goenv.outputs.go_cache }}
         key: go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
+        restore-keys: |
+          go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
+          go-${{ runner.os }}-
