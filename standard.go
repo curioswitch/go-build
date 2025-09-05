@@ -322,9 +322,9 @@ func (a artifactsPath) apply(c *config) {
 	c.artifactsPath = string(a)
 }
 
-// BuildFolder sets the name fo the folder that contains build configuration. If not provided, the
+// Folder sets the name fo the folder that contains build configuration. If not provided, the
 // default is "build".
-func BuildFolder(folder string) Option {
+func Folder(folder string) Option {
 	return buildFolder(folder)
 }
 
