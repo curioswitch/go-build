@@ -16,5 +16,5 @@ const (
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
 	verPinact = "v3.4.2"
 	// renovate: github.com/reviewdog/reviewdog
-	verReviewdog = "v0.20.3"
+	verReviewdog = "v0.21.0"
 )
