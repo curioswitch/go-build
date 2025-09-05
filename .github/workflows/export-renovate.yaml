@@ -30,16 +30,17 @@ jobs:
           app-id: ${{ inputs.github_app_id }}
           private-key: ${{ secrets.github_app_key }}
 
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+
+      - uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5 # v2.0.1
+
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
 
-      - uses: renovatebot/github-action@7876d7a812254599d262d62b6b2c2706018258a2 # v43.0.10
-        with:
-          renovate-version: full
-          configurationFile: renovate.json
-          token: ${{ steps.app-token.outputs.token }}
+      - run: bunx renovate
         env:
+          RENOVATE_TOKEN: ${{ steps.app-token.outputs.token }}
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_ALLOWED_COMMANDS: "^go work sync$,^go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'$"
