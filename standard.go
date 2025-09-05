@@ -244,7 +244,7 @@ func DefineTasks(opts ...Option) {
 			for _, dir := range modDirs(a) {
 				cmd.Exec(a, "go mod download", cmd.Dir(dir))
 				if !strings.HasSuffix(dir, "/"+conf.buildFolder) {
-					cmd.Exec(a, fmt.Sprintf("go run ./%s download-tools", conf.buildFolder))
+					cmd.Exec(a, fmt.Sprintf("go run ./%s download-tools", conf.buildFolder), cmd.Dir(dir))
 				}
 			}
 		},
