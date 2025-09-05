@@ -9,7 +9,6 @@
     "recommendations": ["esbenp.prettier-vscode", "foxundermoon.shell-format"]
   },
   "settings": {
-    "editor.tabSize": 2,
     "files.associations": {
       "renovate*.json": "jsonc"
     },
