@@ -48,6 +48,10 @@ func DefineTasks(opts ...Option) {
 		conf.verGoShellcheck = verGoShellcheck
 	}
 
+	if conf.verGoTestsum == "" {
+		conf.verGoTestsum = verGoTestsum
+	}
+
 	if conf.verGoYamllint == "" {
 		conf.verGoYamllint = verGoYamllint
 	}
@@ -73,6 +77,7 @@ func DefineTasks(opts ...Option) {
 	runGolangCILint := "go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@" + conf.verGolangCILint
 	runGoPrettier := "go run github.com/wasilibs/go-prettier/v3/cmd/prettier@" + conf.verGoPrettier
 	runGoShellcheck := "go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@" + conf.verGoShellcheck
+	runGoTestsum := "go run gotest.tools/gotestsum@" + conf.verGoTestsum
 	runGoYamllint := "go run github.com/wasilibs/go-yamllint/cmd/yamllint@" + conf.verGoYamllint
 	runPinact := "go run github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@" + conf.verPinact
 	runReviewDog := "go run github.com/reviewdog/reviewdog/cmd/reviewdog@" + conf.verReviewdog
@@ -192,7 +197,7 @@ func DefineTasks(opts ...Option) {
 					a.Errorf("failed to create out directory: %v", err)
 					return
 				}
-				cmd.Exec(a, fmt.Sprintf("go test -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", filepath.Join(conf.artifactsPath, "coverage.txt")))
+				cmd.Exec(a, fmt.Sprintf("%s -- -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", runGoTestsum, filepath.Join(conf.artifactsPath, "coverage.txt")))
 			},
 		}))
 	}
@@ -246,6 +251,10 @@ func DefineTasks(opts ...Option) {
 					cmd.Exec(a, c, cmd.Stdout(io.Discard))
 				}
 			}
+			// Ignore downloadTools for gotestsum
+			if !conf.excluded("test-go") {
+				cmd.Exec(a, runGoTestsum+" -h", cmd.Stdout(io.Discard))
+			}
 		},
 	})
 
@@ -291,6 +300,7 @@ type config struct {
 	verGoPrettier   string
 	verGoYamllint   string
 	verGoShellcheck string
+	verGoTestsum    string
 	verPinact       string
 	verReviewdog    string
 
@@ -454,6 +464,18 @@ type versionGoShellcheck string
 
 func (v versionGoShellcheck) apply(c *config) {
 	c.verGoShellcheck = string(v)
+}
+
+// VersionGoTestsum returns an Option to set the version of gotestsum to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoTestsum(version string) Option {
+	return versionGoTestsum(version)
+}
+
+type versionGoTestsum string
+
+func (v versionGoTestsum) apply(c *config) {
+	c.verGoTestsum = string(v)
 }
 
 // VersionGoYamllint returns an Option to set the version of go-yamllint to use. If unset,
