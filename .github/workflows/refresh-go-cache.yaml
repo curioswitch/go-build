@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - go.work
       - "**/go.mod"
       - versions.go
       - .github/workflows/export-refresh-go-cache.yaml
