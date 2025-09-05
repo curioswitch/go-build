@@ -197,7 +197,11 @@ func DefineTasks(opts ...Option) {
 					a.Errorf("failed to create out directory: %v", err)
 					return
 				}
-				cmd.Exec(a, fmt.Sprintf("%s -- -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", runGoTestsum, filepath.Join(conf.artifactsPath, "coverage.txt")))
+				format := ""
+				if conf.goTestsumFormat != "" {
+					format = "--format=" + conf.goTestsumFormat
+				}
+				cmd.Exec(a, fmt.Sprintf("%s %s -- -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", runGoTestsum, format, filepath.Join(conf.artifactsPath, "coverage.txt")))
 			},
 		}))
 	}
@@ -294,6 +298,7 @@ type config struct {
 	excludeTasks     []string
 	buildTags        []string
 	disableReviewdog bool
+	goTestsumFormat  string
 
 	verActionlint   string
 	verGolangCILint string
@@ -416,6 +421,18 @@ func execReviewdog(conf config, a *goyek.A, runReviewdog string, format string, 
 		return true
 	}
 	return cmd.Exec(a, fmt.Sprintf("%s %s -fail-level=warning -reporter=github-check", runReviewdog, format), cmd.Stdin(&stderr))
+}
+
+// GoTestsumFormat returns an Option to customize the format reported by test results via gotestsum.
+// See https://github.com/gotestyourself/gotestsum#output-format
+func GoTestsumFormat(format string) Option {
+	return goTestsumFormat(format)
+}
+
+type goTestsumFormat string
+
+func (g goTestsumFormat) apply(c *config) {
+	c.goTestsumFormat = string(g)
 }
 
 // VersionActionlint returns an Option to set the version of actionlint to use. If unset,
