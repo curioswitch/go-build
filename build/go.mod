@@ -3,7 +3,7 @@ module build
 go 1.24.0
 
 require (
-	github.com/curioswitch/go-build v0.4.0
+	github.com/curioswitch/go-build v0.5.2
 	github.com/goyek/x v0.3.0
 )
 
