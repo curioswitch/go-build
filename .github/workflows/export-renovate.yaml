@@ -40,7 +40,7 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
-      - run: npx renovate
+      - run: npx renovate@latest
         env:
           RENOVATE_TOKEN: ${{ steps.app-token.outputs.token }}
           RENOVATE_PLATFORM: github
