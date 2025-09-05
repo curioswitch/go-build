@@ -14,7 +14,6 @@ import (
 	"github.com/goyek/goyek/v2"
 	_ "github.com/goyek/x/boot" // define flags to override
 	"github.com/goyek/x/cmd"
-	"golang.org/x/mod/modfile"
 )
 
 // DefineTasks defines common tasks for Go projects.
@@ -64,7 +63,11 @@ func DefineTasks(opts ...Option) {
 		conf.verReviewdog = verReviewdog
 	}
 
-	golangciTargets := []string{"./..."}
+	var golangciTargets []string
+	// Rare to not have a go.mod, except for a monorepo root where it's common.
+	if fileExists("go.mod") {
+		golangciTargets = append(golangciTargets, "./...")
+	}
 	// Uses of go-build will very commonly have a build folder, if it is also a module,
 	// then let's automatically run checks on it.
 	if fileExists(filepath.Join("build", "go.mod")) {
@@ -206,7 +209,7 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
-	if !conf.excluded("runall") && fileExists("go.work") {
+	if !conf.excluded("runall") {
 		RegisterGenerateTask(goyek.Define(goyek.Task{
 			Name:  "runall",
 			Usage: "Runs a command in each module in the workspace.",
@@ -215,18 +218,8 @@ func DefineTasks(opts ...Option) {
 					a.Error("missing -cmd flag required for runall")
 					return
 				}
-				content, err := os.ReadFile("go.work")
-				if err != nil {
-					a.Errorf("failed to read go.work: %v", err)
-					return
-				}
-				wf, err := modfile.ParseWork("go.work", content, nil)
-				if err != nil {
-					a.Errorf("failed to parse go.work: %v", err)
-					return
-				}
-				for _, u := range wf.Use {
-					cmd.Exec(a, *command, cmd.Dir(filepath.Join(".", u.Path)))
+				for _, dir := range modDirs(a) {
+					cmd.Exec(a, *command, cmd.Dir(dir))
 				}
 			},
 		}))
@@ -249,7 +242,9 @@ func DefineTasks(opts ...Option) {
 		Name:  "download",
 		Usage: "Downloads build dependencies.",
 		Action: func(a *goyek.A) {
-			cmd.Exec(a, "go mod download")
+			for _, dir := range modDirs(a) {
+				cmd.Exec(a, "go mod download", cmd.Dir(dir))
+			}
 			if conf.downloadToolsAllOSes || runtime.GOOS == "linux" {
 				for c := range commandDownloads {
 					cmd.Exec(a, c, cmd.Stdout(io.Discard))
@@ -384,6 +379,14 @@ func fileExists(p string) bool {
 		return true
 	}
 	return false
+}
+
+func modDirs(a *goyek.A) []string {
+	var out bytes.Buffer
+	if !cmd.Exec(a, "go list -m -f {{.Dir}}", cmd.Stdout(&out)) {
+		return nil
+	}
+	return strings.Split(strings.TrimSpace(out.String()), "\n")
 }
 
 // Tags returns an Option to add build tags to Go lint tasks. If any code is guarded by a build tag
