@@ -12,7 +12,7 @@ const (
 	// renovate: gotest.tools/gotestsum
 	verGoTestsum = "v1.13.0"
 	// renovate: github.com/wasilibs/go-yamllint
-	verGoYamllint = "v1.35.1"
+	verGoYamllint = "v1.37.1"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
 	verPinact = "v3.4.2"
 	// renovate: github.com/reviewdog/reviewdog
