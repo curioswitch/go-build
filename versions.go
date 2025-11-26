@@ -2,7 +2,7 @@ package build
 
 const (
 	// renovate: github.com/rhysd/actionlint
-	verActionlint = "v1.7.8"
+	verActionlint = "v1.7.9"
 	// renovate: github.com/golangci/golangci-lint/v2
 	verGolangCILint = "v2.6.2"
 	// renovate: github.com/wasilibs/go-prettier/v3
