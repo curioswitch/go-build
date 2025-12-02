@@ -11,7 +11,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/goyek/goyek/v2"
+	"github.com/goyek/goyek/v3"
 	_ "github.com/goyek/x/boot" // define flags to override
 	"github.com/goyek/x/cmd"
 )
@@ -21,8 +21,6 @@ func DefineTasks(opts ...Option) {
 	// Override the goyek verbosity default to true since it's generally better.
 	// -v=false can still be used to disable it.
 	_ = flag.Lookup("v").Value.Set("true")
-
-	command := flag.String("cmd", "", "Command to execute with runall.")
 
 	conf := config{
 		artifactsPath:   "out",
@@ -197,12 +195,9 @@ func DefineTasks(opts ...Option) {
 			Name:  "runall",
 			Usage: "Runs a command in each module in the workspace.",
 			Action: func(a *goyek.A) {
-				if *command == "" {
-					a.Error("missing -cmd flag required for runall")
-					return
-				}
+				command := strings.Join(flag.CommandLine.Args(), " ")
 				for _, dir := range modDirs(a) {
-					cmd.Exec(a, *command, cmd.Dir(dir))
+					cmd.Exec(a, command, cmd.Dir(dir))
 				}
 			},
 		}))
