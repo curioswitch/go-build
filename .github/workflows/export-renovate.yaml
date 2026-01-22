@@ -51,3 +51,5 @@ jobs:
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_ALLOWED_COMMANDS: "^go work sync$,^go list -m -json | jq '.Dir' | xargs -L1 -I'{}' sh -c 'cd {} && go mod tidy'$"
           LOG_LEVEL: ${{ inputs.debug && 'DEBUG' || 'INFO' }}
+          # Allows go work sync to work when Go itself is updated
+          GOTOOLCHAIN: auto
