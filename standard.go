@@ -190,19 +190,6 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
-	if !conf.excluded("runall") {
-		RegisterGenerateTask(goyek.Define(goyek.Task{
-			Name:  "runall",
-			Usage: "Runs a command in each module in the workspace.",
-			Action: func(a *goyek.A) {
-				command := strings.Join(flag.CommandLine.Args(), " ")
-				for _, dir := range modDirs(a) {
-					cmd.Exec(a, command, cmd.Dir(dir))
-				}
-			},
-		}))
-	}
-
 	if !conf.excluded("lint-github") && fileExists(".github") {
 		RegisterCommandDownloads(runPinact, runActionlint)
 		RegisterLintTask(goyek.Define(goyek.Task{
@@ -244,6 +231,19 @@ func DefineTasks(opts ...Option) {
 			}
 		},
 	})
+
+	if !conf.excluded("runall") {
+		goyek.Define(goyek.Task{
+			Name:  "runall",
+			Usage: "Runs a command in each module in the workspace.",
+			Action: func(a *goyek.A) {
+				command := strings.Join(flag.CommandLine.Args(), " ")
+				for _, dir := range modDirs(a) {
+					cmd.Exec(a, command, cmd.Dir(dir))
+				}
+			},
+		})
+	}
 
 	goyek.Define(goyek.Task{
 		Name:  "format",
