@@ -14,7 +14,7 @@ const (
 	// renovate: github.com/wasilibs/go-yamllint
 	verGoYamllint = "v1.38.0"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
-	verPinact = "v3.8.0"
+	verPinact = "v3.9.0"
 	// renovate: github.com/reviewdog/reviewdog
 	verReviewdog = "v0.21.0"
 )
