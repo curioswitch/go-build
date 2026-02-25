@@ -1,4 +1,4 @@
-package build
+package build //nolint:revive
 
 const (
 	// renovate: github.com/rhysd/actionlint
