@@ -44,7 +44,7 @@
       "matchDepNames": ["go"],
       "matchDepTypes": ["golang"],
       "rangeStrategy": "bump",
-      "allowedVersions": "1.25.0",
+      "allowedVersions": "/^1\\.25\\.0$/",
       "groupName": "Go"
     },
     {
