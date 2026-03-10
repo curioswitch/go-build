@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["helpers:pinGitHubActionDigests"],
+  "extends": ["helpers:pinGitHubActionDigests", "schedule:earlyMondays"],
   "platformCommit": "enabled",
   "labels": ["dependencies"],
   "prHourlyLimit": 0,
