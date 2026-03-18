@@ -32,3 +32,12 @@ runs:
         restore-keys: |
           go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
           go-${{ runner.os }}-
+
+    - uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+      with:
+        path: |
+          ${{ steps.goenv.outputs.go_cache }}
+        key: gocache-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
+        restore-keys: |
+          gocache-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
+          gocache-${{ runner.os }}-
