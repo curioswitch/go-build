@@ -28,10 +28,10 @@ runs:
         path: |
           ${{ steps.goenv.outputs.go_modcache }}
           ${{ steps.goenv.outputs.go_cache }}
-        key: go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
+        key: gomod-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
         restore-keys: |
-          go-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
-          go-${{ runner.os }}-
+          gomod-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
+          gomod-${{ runner.os }}-
 
     - uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
