@@ -4,7 +4,7 @@ const (
 	// renovate: github.com/rhysd/actionlint
 	verActionlint = "v1.7.12"
 	// renovate: github.com/golangci/golangci-lint/v2
-	verGolangCILint = "v2.11.4"
+	verGolangCILint = "v2.12.2"
 	// renovate: github.com/wasilibs/go-prettier/v3
 	verGoPrettier = "v3.8.1"
 	// renovate: github.com/wasilibs/go-shellcheck
@@ -14,7 +14,7 @@ const (
 	// renovate: github.com/wasilibs/go-yamllint
 	verGoYamllint = "v1.38.0"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
-	verPinact = "v3.9.0"
+	verPinact = "v3.9.2"
 	// renovate: github.com/reviewdog/reviewdog
 	verReviewdog = "v0.21.0"
 )
