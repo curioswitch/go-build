@@ -1,4 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>curioswitch/go-build:renovate-export"]
+  "extends": ["github>curioswitch/go-build:renovate-export"],
+  "packageRules": [
+    {
+      // Pinned by renovate CLI
+      "matchCurrentVersion": "10",
+      "matchPackageNames": ["pnpm"],
+      "enabled": false
+    }
+  ]
 }
