@@ -4,6 +4,7 @@
   "platformCommit": "enabled",
   "labels": ["dependencies"],
   "prHourlyLimit": 0,
+  "separateMajorMinor": false,
   "postUpgradeTasks": {
     "commands": [
       "go work sync",
