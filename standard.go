@@ -59,7 +59,7 @@ func DefineTasks(opts ...Option) {
 	runGoShellcheck := "go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@" + conf.verGoShellcheck
 	runGoTestsum := "go run gotest.tools/gotestsum@" + conf.verGoTestsum
 	runGoYamllint := "go run github.com/wasilibs/go-yamllint/cmd/yamllint@" + conf.verGoYamllint
-	runPinact := "go run github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@" + conf.verPinact
+	runPinact := "go run github.com/suzuki-shunsuke/pinact/v4/cmd/pinact@" + conf.verPinact
 	runReviewDog := "go run github.com/reviewdog/reviewdog/cmd/reviewdog@" + conf.verReviewdog
 
 	if !conf.excluded("format-go") {
