@@ -123,7 +123,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-markdown") {
-		RegisterCommandDownloads(runGoRumdl)
+		RegisterCommandDownloads(runGoRumdl + " --version")
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-markdown",
 			Usage:    "Formats Markdown code.",
@@ -135,7 +135,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-markdown") {
-		RegisterCommandDownloads(runGoRumdl)
+		RegisterCommandDownloads(runGoRumdl + " --version")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-markdown",
 			Usage:    "Lints Markdown code.",
@@ -171,7 +171,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-toml") {
-		RegisterCommandDownloads(runGoTombi)
+		RegisterCommandDownloads(runGoTombi + " --version")
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-toml",
 			Usage:    "Formats TOML code.",
@@ -187,7 +187,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-toml") {
-		RegisterCommandDownloads(runGoTombi, runGoRyl+" -v")
+		RegisterCommandDownloads(runGoTombi + " --version")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-toml",
 			Usage:    "Lints TOML code.",
@@ -205,7 +205,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("format-yaml") {
-		RegisterCommandDownloads(runGoPrettier)
+		RegisterCommandDownloads(runGoPrettier, runGoRyl+" --version")
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-yaml",
 			Usage:    "Formats YAML code.",
@@ -223,7 +223,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-yaml") {
-		RegisterCommandDownloads(runGoPrettier, runGoRyl+" -v")
+		RegisterCommandDownloads(runGoPrettier, runGoRyl+" --version")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-yaml",
 			Usage:    "Lints YAML code.",
@@ -259,7 +259,7 @@ func DefineTasks(opts ...Option) {
 	}
 
 	if !conf.excluded("lint-github") && fileExists(".github") {
-		RegisterCommandDownloads(runPinact, runActionlint)
+		RegisterCommandDownloads(runPinact, runActionlint, runGoShellcheck+" --version")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-github",
 			Usage:    "Lints GitHub Actions workflows.",
