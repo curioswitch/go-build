@@ -1,12 +1,27 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>curioswitch/go-build:renovate-export"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)export-renovate\\.yaml$/"],
+      "datasourceTemplate": "npm",
+      "depNameTemplate": "renovate",
+      "matchStrings": ["renovate@(?<currentValue>[^\\s]+)"],
+    },
+  ],
   "packageRules": [
     {
       // Pinned by renovate CLI
       "matchCurrentVersion": "10",
       "matchPackageNames": ["pnpm"],
       "enabled": false,
+    },
+    {
+      "matchManagers": ["regex"],
+      "matchDatasources": ["npm"],
+      "matchDepNames": ["renovate"],
+      "groupName": "Renovate",
     },
   ],
 }
