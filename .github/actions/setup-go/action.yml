@@ -16,7 +16,7 @@ runs:
     - name: resolve go environment
       id: goenv
       shell: bash
-      run: |
+      run: |-
         {
           echo "go_cache=$(go env GOCACHE)"
           echo "go_modcache=$(go env GOMODCACHE)"
@@ -25,19 +25,19 @@ runs:
 
     - uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
-        path: |
+        path: |-
           ${{ steps.goenv.outputs.go_modcache }}
           ${{ steps.goenv.outputs.go_cache }}
         key: gomod-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
-        restore-keys: |
+        restore-keys: |-
           gomod-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
           gomod-${{ runner.os }}-
 
     - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
-        path: |
+        path: |-
           ${{ steps.goenv.outputs.go_cache }}
         key: gocache-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
-        restore-keys: |
+        restore-keys: |-
           gocache-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-
           gocache-${{ runner.os }}-

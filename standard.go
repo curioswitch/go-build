@@ -29,8 +29,10 @@ func DefineTasks(opts ...Option) {
 		verGolangCILint: verGolangCILint,
 		verGoPrettier:   verGoPrettier,
 		verGoShellcheck: verGoShellcheck,
+		verGoRumdl:      verGoRumdl,
 		verGoTestsum:    verGoTestsum,
-		verGoYamllint:   verGoYamllint,
+		verGoTombi:      verGoTombi,
+		verGoRyl:        verGoRyl,
 		verPinact:       verPinact,
 		verReviewdog:    verReviewdog,
 	}
@@ -57,8 +59,10 @@ func DefineTasks(opts ...Option) {
 	runGolangCILint := "go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@" + conf.verGolangCILint
 	runGoPrettier := "go run github.com/wasilibs/go-prettier/v3/cmd/prettier@" + conf.verGoPrettier
 	runGoShellcheck := "go run github.com/wasilibs/go-shellcheck/cmd/shellcheck@" + conf.verGoShellcheck
+	runGoRumdl := "go run github.com/wasilibs/go-rumdl/cmd/rumdl@" + conf.verGoRumdl
+	runGoRyl := "go run github.com/wasilibs/go-ryl/cmd/ryl@" + conf.verGoRyl
 	runGoTestsum := "go run gotest.tools/gotestsum@" + conf.verGoTestsum
-	runGoYamllint := "go run github.com/wasilibs/go-yamllint/cmd/yamllint@" + conf.verGoYamllint
+	runGoTombi := "go run github.com/wasilibs/go-tombi/cmd/tombi@" + conf.verGoTombi
 	runPinact := "go run github.com/suzuki-shunsuke/pinact/v4/cmd/pinact@" + conf.verPinact
 	runReviewDog := "go run github.com/reviewdog/reviewdog/cmd/reviewdog@" + conf.verReviewdog
 
@@ -94,26 +98,50 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
-	if !conf.excluded("format-markdown") {
+	if !conf.excluded("format-json") {
 		RegisterCommandDownloads(runGoPrettier)
+		RegisterFormatTask(goyek.Define(goyek.Task{
+			Name:     "format-json",
+			Usage:    "Formats JSON code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.json' '**/*.jsonc' '**/*.code-workspace'")
+			},
+		}))
+	}
+
+	if !conf.excluded("lint-json") {
+		RegisterCommandDownloads(runGoPrettier)
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-json",
+			Usage:    "Lints JSON code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.json' '**/*.jsonc' '**/*.code-workspace'")
+			},
+		}))
+	}
+
+	if !conf.excluded("format-markdown") {
+		RegisterCommandDownloads(runGoRumdl)
 		RegisterFormatTask(goyek.Define(goyek.Task{
 			Name:     "format-markdown",
 			Usage:    "Formats Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.md'")
+				cmd.Exec(a, runGoRumdl+" fmt")
 			},
 		}))
 	}
 
 	if !conf.excluded("lint-markdown") {
-		RegisterCommandDownloads(runGoPrettier)
+		RegisterCommandDownloads(runGoRumdl)
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-markdown",
 			Usage:    "Lints Markdown code.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.md'")
+				cmd.Exec(a, runGoRumdl+" check")
 			},
 		}))
 	}
@@ -142,6 +170,40 @@ func DefineTasks(opts ...Option) {
 		}))
 	}
 
+	if !conf.excluded("format-toml") {
+		RegisterCommandDownloads(runGoTombi)
+		RegisterFormatTask(goyek.Define(goyek.Task{
+			Name:     "format-toml",
+			Usage:    "Formats TOML code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				if root == "" {
+					cmd.Exec(a, runGoTombi+" format .")
+				} else {
+					cmd.Exec(a, runGoTombi+" format "+target, cmd.Dir(root))
+				}
+			},
+		}))
+	}
+
+	if !conf.excluded("lint-toml") {
+		RegisterCommandDownloads(runGoTombi, runGoRyl+" -v")
+		RegisterLintTask(goyek.Define(goyek.Task{
+			Name:     "lint-toml",
+			Usage:    "Lints TOML code.",
+			Parallel: true,
+			Action: func(a *goyek.A) {
+				if root == "" {
+					cmd.Exec(a, runGoTombi+" format --check .")
+					cmd.Exec(a, runGoTombi+" lint .")
+				} else {
+					cmd.Exec(a, runGoTombi+" format --check "+target, cmd.Dir(root))
+					cmd.Exec(a, runGoTombi+" lint "+target, cmd.Dir(root))
+				}
+			},
+		}))
+	}
+
 	if !conf.excluded("format-yaml") {
 		RegisterCommandDownloads(runGoPrettier)
 		RegisterFormatTask(goyek.Define(goyek.Task{
@@ -150,12 +212,18 @@ func DefineTasks(opts ...Option) {
 			Parallel: true,
 			Action: func(a *goyek.A) {
 				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --write '**/*.yaml' '**/*.yml'")
+
+				if root == "" {
+					cmd.Exec(a, runGoRyl+" check --fix .")
+				} else {
+					cmd.Exec(a, runGoRyl+" check --fix "+target, cmd.Dir(root))
+				}
 			},
 		}))
 	}
 
 	if !conf.excluded("lint-yaml") {
-		RegisterCommandDownloads(runGoPrettier, runGoYamllint+" -v")
+		RegisterCommandDownloads(runGoPrettier, runGoRyl+" -v")
 		RegisterLintTask(goyek.Define(goyek.Task{
 			Name:     "lint-yaml",
 			Usage:    "Lints YAML code.",
@@ -164,9 +232,9 @@ func DefineTasks(opts ...Option) {
 				cmd.Exec(a, runGoPrettier+" --no-error-on-unmatched-pattern --check '**/*.yaml' '**/*.yml'")
 
 				if root == "" {
-					cmd.Exec(a, runGoYamllint+" .")
+					cmd.Exec(a, runGoRyl+" check .")
 				} else {
-					cmd.Exec(a, runGoYamllint+" "+target, cmd.Dir(root))
+					cmd.Exec(a, runGoRyl+" check "+target, cmd.Dir(root))
 				}
 			},
 		}))
@@ -287,8 +355,10 @@ type config struct {
 	verActionlint   string
 	verGolangCILint string
 	verGoPrettier   string
-	verGoYamllint   string
+	verGoRyl        string
+	verGoRumdl      string
 	verGoShellcheck string
+	verGoTombi      string
 	verGoTestsum    string
 	verPinact       string
 	verReviewdog    string
@@ -475,6 +545,18 @@ func (v versionGoPrettier) apply(c *config) {
 	c.verGoPrettier = string(v)
 }
 
+// VersionGoRumdl returns an Option to set the version of go-rumdl to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoRumdl(version string) Option {
+	return versionGoRumdl(version)
+}
+
+type versionGoRumdl string
+
+func (v versionGoRumdl) apply(c *config) {
+	c.verGoRumdl = string(v)
+}
+
 // VersionGoShellcheck returns an Option to set the version of go-shellcheck to use. If unset,
 // a default version is used which may not be the latest.
 func VersionGoShellcheck(version string) Option {
@@ -499,16 +581,28 @@ func (v versionGoTestsum) apply(c *config) {
 	c.verGoTestsum = string(v)
 }
 
-// VersionGoYamllint returns an Option to set the version of go-yamllint to use. If unset,
+// VersionGoRyl returns an Option to set the version of go-ryl to use. If unset,
 // a default version is used which may not be the latest.
-func VersionGoYamllint(version string) Option {
-	return versionGoYamllint(version)
+func VersionGoRyl(version string) Option {
+	return versionGoRyl(version)
 }
 
-type versionGoYamllint string
+type versionGoRyl string
 
-func (v versionGoYamllint) apply(c *config) {
-	c.verGoYamllint = string(v)
+func (v versionGoRyl) apply(c *config) {
+	c.verGoRyl = string(v)
+}
+
+// VersionGoTombi returns an Option to set the version of go-tombi to use. If unset,
+// a default version is used which may not be the latest.
+func VersionGoTombi(version string) Option {
+	return versionGoTombi(version)
+}
+
+type versionGoTombi string
+
+func (v versionGoTombi) apply(c *config) {
+	c.verGoTombi = string(v)
 }
 
 // VersionPinact returns an Option to set the version of pinact to use. If unset,
