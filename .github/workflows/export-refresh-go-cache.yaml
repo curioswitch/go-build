@@ -32,7 +32,7 @@ jobs:
       - name: resolve environment
         id: goenv
         shell: bash
-        run: |
+        run: |-
           {
             echo "go_cache=$(go env GOCACHE)"
             echo "go_modcache=$(go env GOMODCACHE)"
@@ -41,12 +41,12 @@ jobs:
 
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: |
+          path: |-
             ${{ steps.goenv.outputs.go_modcache }}
           key: gomod-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}
 
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: |
+          path: |-
             ${{ steps.goenv.outputs.go_cache }}
           key: gocache-${{ runner.os }}-${{ steps.goenv.outputs.go_version }}-${{ hashFiles('**/go.mod', '**/versions.go') }}

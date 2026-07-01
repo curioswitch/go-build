@@ -7,12 +7,16 @@ const (
 	verGolangCILint = "v2.12.2"
 	// renovate: github.com/wasilibs/go-prettier/v3
 	verGoPrettier = "v3.8.4"
+	// renovate: github.com/wasilibs/go-rumdl
+	verGoRumdl = "v0.2.26"
+	// renovate: github.com/wasilibs/go-ryl
+	verGoRyl = "v0.21.0"
 	// renovate: github.com/wasilibs/go-shellcheck
 	verGoShellcheck = "v0.11.1"
+	// renovate: github.com/wasilibs/go-tombi
+	verGoTombi = "v1.1.6"
 	// renovate: gotest.tools/gotestsum
 	verGoTestsum = "v1.13.0"
-	// renovate: github.com/wasilibs/go-yamllint
-	verGoYamllint = "v1.38.0"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
 	verPinact = "v4.1.0"
 	// renovate: github.com/reviewdog/reviewdog
