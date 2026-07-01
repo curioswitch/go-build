@@ -12,11 +12,11 @@ One key point is the word "repository", meaning the focus is not only Go code
 but any file we would typically see with it in a project. This means that
 format and lint tasks target the following languages:
 
-- Go
-- Markdown
-- Shell-like, including Dockerfile (files supported by [mvdan-sh](https://github.com/mvdan/sh))
-- YAML
-- GitHub Actions
+*   Go
+*   Markdown
+*   Shell-like, including Dockerfile (files supported by [mvdan-sh](https://github.com/mvdan/sh))
+*   YAML
+*   GitHub Actions
 
 All supporting tasks are executed with `go run` - this means that all languages
 can be processed with only a single tool dependency, Go itself. Programs like
@@ -47,10 +47,10 @@ paths.
 A list of all tasks can be seen with `go run ./build -h`. The commonly used tasks
 will likely be:
 
-- `go run ./build check` - executes all code checks, including lint and unit tests.
-  This should be the command run from a CI script.
+*   `go run ./build check` - executes all code checks, including lint and unit tests.
+    This should be the command run from a CI script.
 
-- `go run ./build format` - executes all auto-formatting.
+*   `go run ./build format` - executes all auto-formatting.
 
 Note that for formatting Go code, currently the only tool that is run is
 [golangci-lint](https://golangci-lint.run/usage/linters/) with autofixes enabled.
