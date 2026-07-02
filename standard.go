@@ -253,7 +253,11 @@ func DefineTasks(opts ...Option) {
 				if conf.goTestsumFormat != "" {
 					format = "--format=" + conf.goTestsumFormat
 				}
-				cmd.Exec(a, fmt.Sprintf("%s %s -- -coverprofile=%s -covermode=atomic -v -timeout=20m ./...", runGoTestsum, format, filepath.Join(conf.artifactsPath, "coverage.txt")))
+				coverage := ""
+				if !conf.disableCoverage {
+					coverage = fmt.Sprintf("-coverprofile=%s -covermode=atomic", filepath.Join(conf.artifactsPath, "coverage.txt"))
+				}
+				cmd.Exec(a, fmt.Sprintf("%s %s -- %s -v -timeout=20m ./...", runGoTestsum, format, coverage))
 			},
 		}))
 	}
@@ -351,6 +355,7 @@ type config struct {
 	buildTags        []string
 	disableReviewdog bool
 	goTestsumFormat  string
+	disableCoverage  bool
 
 	verActionlint   string
 	verGolangCILint string
@@ -640,4 +645,15 @@ type downloadToolsAllOSes struct{}
 
 func (d downloadToolsAllOSes) apply(c *config) {
 	c.downloadToolsAllOSes = true
+}
+
+// DisableCoverage returns an Option to disable coverage reporting in Go tests. By default, coverage is enabled.
+func DisableCoverage() Option {
+	return disableCoverage{}
+}
+
+type disableCoverage struct{}
+
+func (d disableCoverage) apply(c *config) {
+	c.disableCoverage = true
 }
