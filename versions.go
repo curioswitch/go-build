@@ -6,7 +6,7 @@ const (
 	// renovate: github.com/golangci/golangci-lint/v2
 	verGolangCILint = "v2.12.2"
 	// renovate: github.com/wasilibs/go-prettier/v3
-	verGoPrettier = "v3.9.1"
+	verGoPrettier = "v3.9.4"
 	// renovate: github.com/wasilibs/go-rumdl
 	verGoRumdl = "v0.2.26"
 	// renovate: github.com/wasilibs/go-ryl
