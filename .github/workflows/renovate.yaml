@@ -1,6 +1,9 @@
 name: Renovate Dependencies
 
 on:
+  pull_request:
+    paths:
+      - .github/workflows/export-renovate.yaml
   schedule:
     # https://crontab.guru/#5_12_*_*_1
     - cron: "5 12 * * 1"
