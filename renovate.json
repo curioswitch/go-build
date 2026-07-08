@@ -7,21 +7,21 @@
       "managerFilePatterns": ["/(^|/)export-renovate\\.yaml$/"],
       "datasourceTemplate": "npm",
       "depNameTemplate": "renovate",
-      "matchStrings": ["renovate@(?<currentValue>[^\\s]+)"],
-    },
+      "matchStrings": ["renovate@(?<currentValue>[^\\s]+)"]
+    }
   ],
   "packageRules": [
     {
       // Pinned by renovate CLI
       "matchCurrentVersion": "10",
       "matchPackageNames": ["pnpm"],
-      "enabled": false,
+      "enabled": false
     },
     {
       "matchManagers": ["regex"],
       "matchDatasources": ["npm"],
       "matchDepNames": ["renovate"],
-      "groupName": "Renovate",
-    },
-  ],
+      "groupName": "Renovate"
+    }
+  ]
 }
