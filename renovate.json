@@ -13,7 +13,6 @@
   "packageRules": [
     {
       // Pinned by renovate CLI
-      "matchCurrentVersion": "10",
       "matchPackageNames": ["pnpm"],
       "enabled": false
     },
