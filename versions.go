@@ -8,7 +8,7 @@ const (
 	// renovate: github.com/wasilibs/go-prettier/v3
 	verGoPrettier = "v3.9.6"
 	// renovate: github.com/wasilibs/go-rumdl
-	verGoRumdl = "v0.2.40"
+	verGoRumdl = "v0.2.49"
 	// renovate: github.com/wasilibs/go-ryl
 	verGoRyl = "v0.21.0"
 	// renovate: github.com/wasilibs/go-shellcheck
@@ -18,7 +18,7 @@ const (
 	// renovate: gotest.tools/gotestsum
 	verGoTestsum = "v1.13.0"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
-	verPinact = "v4.1.0"
+	verPinact = "v4.1.1"
 	// renovate: github.com/reviewdog/reviewdog
 	verReviewdog = "v0.21.0"
 )
