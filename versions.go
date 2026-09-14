@@ -18,7 +18,7 @@ const (
 	// renovate: gotest.tools/gotestsum
 	verGoTestsum = "v1.13.0"
 	// renovate: github.com/suzuki-shunsuke/pinact/v3
-	verPinact = "v4.1.1"
+	verPinact = "v5.0.0"
 	// renovate: github.com/reviewdog/reviewdog
-	verReviewdog = "v0.21.0"
+	verReviewdog = "v0.21.1"
 )
