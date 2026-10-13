@@ -269,7 +269,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints GitHub Actions workflows.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, runPinact+" run -check")
+				cmd.Exec(a, runPinact+" run --check")
 				cmd.Exec(a, fmt.Sprintf(`%s -shellcheck="%s"`, runActionlint, runGoShellcheck))
 			},
 		}))
