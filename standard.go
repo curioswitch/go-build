@@ -63,7 +63,7 @@ func DefineTasks(opts ...Option) {
 	runGoRyl := "go run github.com/wasilibs/go-ryl/cmd/ryl@" + conf.verGoRyl
 	runGoTestsum := "go run gotest.tools/gotestsum@" + conf.verGoTestsum
 	runGoTombi := "go run github.com/wasilibs/go-tombi/cmd/tombi@" + conf.verGoTombi
-	runPinact := "go run github.com/suzuki-shunsuke/pinact/v4/cmd/pinact@" + conf.verPinact
+	runPinact := "go run github.com/suzuki-shunsuke/pinact/v5/cmd/pinact@" + conf.verPinact
 	runReviewDog := "go run github.com/reviewdog/reviewdog/cmd/reviewdog@" + conf.verReviewdog
 
 	if !conf.excluded("format-go") {
@@ -269,7 +269,7 @@ func DefineTasks(opts ...Option) {
 			Usage:    "Lints GitHub Actions workflows.",
 			Parallel: true,
 			Action: func(a *goyek.A) {
-				cmd.Exec(a, runPinact+" run -check")
+				cmd.Exec(a, runPinact+" run --check")
 				cmd.Exec(a, fmt.Sprintf(`%s -shellcheck="%s"`, runActionlint, runGoShellcheck))
 			},
 		}))
