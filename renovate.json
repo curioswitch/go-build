@@ -17,6 +17,11 @@
       "enabled": false
     },
     {
+      // Pinned by renovate CLI
+      "matchPackageNames": ["node"],
+      "enabled": false
+    },
+    {
       "matchManagers": ["regex"],
       "matchDatasources": ["npm"],
       "matchDepNames": ["renovate"],
